@@ -6,6 +6,8 @@
 #include "mygl/geometry.h"
 #include "mygl/camera.h"
 
+using namespace std;
+
 /* translation, scale and color for the ground plane */
 namespace groundPlane
 {
@@ -20,6 +22,62 @@ namespace scaledCube
 const Matrix4D scale = Matrix4D::scale(2.0f, 2.0f, 2.0f);
 const Matrix4D trans = Matrix4D::translation({0.0f, 4.0f, 0.0f});
 }
+
+/* translation, scale and color for the car */
+namespace scaledCar
+{
+    const Vector4D brownColor = { 0.396f, 0.263f, 0.129f, 1.0f }; // for the base
+    const Vector4D orangeColor = { 1.0f, 0.647f, 0.0f, 1.0f }; // for the top
+    const Vector4D blackColor = { 0.05f, 0.05f, 0.05f, 1.0f }; // for the wheels and the axis
+
+    const Matrix4D scale = Matrix4D::scale(1.0f, 1.0f, 1.0f);
+    const Matrix4D trans = Matrix4D::translation({ 0.0f, 1.7f, 0.0f }); //height of 1.2 should be correct (0.8 + 0.4)
+    const Matrix4D baseScale = Matrix4D::scale(4.6f, 0.8f, 1.8f);  // original but to save rotations / transformations left is choosen: Matrix4D::scale(0.8f, 4.6f, 1.8f);
+    const Matrix4D baseTransl = Matrix4D::translation({ 0.0f, 0.0f, 0.0f }); //lets assume it is in the center of the car
+    const Matrix4D topScale = Matrix4D::scale(3.6f, 0.8f, 1.8f);
+    const Matrix4D topTransl =  Matrix4D::translation({ -1.0f, 1.6f, 0.0f }); //lets assume it is in the center of the car // 1.6 is 2*0.8?
+    const Matrix4D spareScale = Matrix4D::scale(0.225f, 0.6f, 0.6f);
+    const Matrix4D spareTransl = Matrix4D::translation({ -4.8f, 0.7f, 0.0f }); // ATTENTION When changing total hight of car, 1.1 - hight?? // I don't get it, please recalculate
+    const Matrix4D frontAxisScale = Matrix4D::scale(0.2f, 0.2f, 1.9f); // z shoud be 1.8
+    const Matrix4D frontAxisTransl = Matrix4D::translation({ 3.2f, -0.9f, 0.0f }); // height: 0.3 - car height (1.2) // BUT needs FIXING
+    const Matrix4D backAxisScale = Matrix4D::scale(0.2f, 0.2f, 1.9f); // z shoud be 1.8
+    const Matrix4D backAxisTransl = Matrix4D::translation({ -2.8f, -0.9f, 0.0f }); // height: 0.3 - car height (1.2) // BUT needs FIXING
+    const Matrix4D wheelScale = Matrix4D::scale(0.6f, 0.6f, 0.225f); 
+    const Matrix4D frontLeftWheelTransl =   Matrix4D::translation({ 3.2f, -0.9f, -2.0f });
+    const Matrix4D frontRightWheelTransl =  Matrix4D::translation({ 3.2f, -0.9f, 2.0f });
+    const Matrix4D backLeftWheelTransl =    Matrix4D::translation({ -2.8f, -0.9f, -2.0f });
+    const Matrix4D backRightWheelTransl =   Matrix4D::translation({ -2.8f, -0.9f, 2.0f });
+
+}
+
+struct car
+{
+    Mesh baseMesh;
+    Matrix4D baseScalingMatrix;
+    Matrix4D baseTranslationMatrix;
+    Mesh topMesh;
+    Matrix4D topScalingMatrix;
+    Matrix4D topTranslationMatrix;
+    Mesh spareMesh;
+    Matrix4D spareScalingMatrix;
+    Matrix4D spareTranslationMatrix;
+    Mesh frontAxisMesh;
+    Matrix4D frontAxisScalingMatrix;
+    Matrix4D frontAxisTranslationMatrix;
+    Mesh backAxisMesh;
+    Matrix4D backAxisScalingMatrix;
+    Matrix4D backAxisTranslationMatrix;
+
+    Matrix4D wheelScalingMatrix;
+    Mesh frontLeftWheelMesh;
+    Matrix4D frontLeftWheelTranslationMatrix;
+    Mesh frontRightWheelMesh;
+    Matrix4D frontRightWheelTranslationMatrix;
+    Mesh backLeftWheelMesh;
+    Matrix4D backLeftWheelTranslationMatrix;
+    Mesh backRightWheelMesh;
+    Matrix4D backRightWheelTranslationMatrix;
+}sCar;
 
 /* struct holding all necessary state variables for scene */
 struct
@@ -38,6 +96,12 @@ struct
     Matrix4D cubeTranslationMatrix;
     Matrix4D cubeTransformationMatrix;
     float cubeSpinRadPerSecond;
+
+    /* car mesh and transformation */
+    car carMesh;
+    Matrix4D carScalingMatrix;
+    Matrix4D carTranslationMatrix;
+    Matrix4D carTransformationMatrix;
 
     /* shader */
     ShaderProgram shaderColor;
@@ -143,7 +207,17 @@ void sceneInit(float width, float height)
 
     /* create opengl buffers for mesh */
     sScene.planeMesh = meshCreate(quad::vertexPos, quad::indices, groundPlane::color);
-    sScene.cubeMesh = meshCreate(cube::vertices, cube::indices);
+    //sScene.cubeMesh = meshCreate(cube::vertices, cube::indices);
+    sScene.carMesh.baseMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::brownColor);
+    sScene.carMesh.topMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::orangeColor);
+    sScene.carMesh.spareMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
+    sScene.carMesh.frontAxisMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
+    sScene.carMesh.backAxisMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
+    sScene.carMesh.frontLeftWheelMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
+    sScene.carMesh.frontRightWheelMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
+    sScene.carMesh.backLeftWheelMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
+    sScene.carMesh.backRightWheelMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
+
 
     /* setup transformation matrices for objects */
     sScene.planeModelMatrix = groundPlane::trans * groundPlane::scale;
@@ -154,6 +228,27 @@ void sceneInit(float width, float height)
     sScene.cubeTransformationMatrix = Matrix4D::identity();
 
     sScene.cubeSpinRadPerSecond = M_PI / 2.0f;
+
+    sScene.carScalingMatrix = scaledCar::scale;
+    sScene.carTranslationMatrix = scaledCar::trans;
+    sScene.carTransformationMatrix = Matrix4D::identity();
+
+    sScene.carMesh.baseScalingMatrix = scaledCar::baseScale;
+    sScene.carMesh.baseTranslationMatrix = scaledCar::baseTransl;
+    sScene.carMesh.topScalingMatrix = scaledCar::topScale;
+    sScene.carMesh.topTranslationMatrix = scaledCar::topTransl;
+    sScene.carMesh.spareScalingMatrix = scaledCar::spareScale;
+    sScene.carMesh.spareTranslationMatrix = scaledCar::spareTransl;
+    sScene.carMesh.frontAxisScalingMatrix = scaledCar::frontAxisScale;
+    sScene.carMesh.frontAxisTranslationMatrix = scaledCar::frontAxisTransl;
+    sScene.carMesh.backAxisScalingMatrix = scaledCar::backAxisScale;
+    sScene.carMesh.backAxisTranslationMatrix = scaledCar::backAxisTransl;
+
+    sScene.carMesh.wheelScalingMatrix = scaledCar::wheelScale;
+    sScene.carMesh.frontLeftWheelTranslationMatrix = scaledCar::frontLeftWheelTransl;
+    sScene.carMesh.frontRightWheelTranslationMatrix = scaledCar::frontRightWheelTransl;
+    sScene.carMesh.backLeftWheelTranslationMatrix = scaledCar::backLeftWheelTransl;
+    sScene.carMesh.backRightWheelTranslationMatrix = scaledCar::backRightWheelTransl;
 
     /* load shader from file */
     sScene.shaderColor = shaderLoad("shader/default.vert", "shader/default.frag");
@@ -209,6 +304,61 @@ void sceneDraw()
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.cubeMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.cubeMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw base of the car */ //one by one... not happy
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.baseTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.baseScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.baseMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.baseMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw top of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.topTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.topScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.topMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.baseMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw spare tire of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.spareTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.spareScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.spareMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.spareMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw front axis of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.frontAxisTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.frontAxisScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.frontAxisMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.frontAxisMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw back axis of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.backAxisTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.backAxisScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.backAxisMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.backAxisMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw front left wheel of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.frontLeftWheelTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.frontLeftWheelMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.frontLeftWheelMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw front right wheel of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.frontRightWheelTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.frontRightWheelMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.frontRightWheelMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw back left wheel of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.backLeftWheelTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.backLeftWheelMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.backLeftWheelMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
+        /* draw back right wheel of the car */
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.backRightWheelTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.carMesh.backRightWheelMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.carMesh.backRightWheelMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+
     }
 
     /* cleanup opengl state */
@@ -267,6 +417,15 @@ int main(int argc, char** argv)
     shaderDelete(sScene.shaderColor);
     meshDelete(sScene.planeMesh);
     meshDelete(sScene.cubeMesh);
+    meshDelete(sScene.carMesh.baseMesh);
+    meshDelete(sScene.carMesh.topMesh);
+    meshDelete(sScene.carMesh.spareMesh);
+    meshDelete(sScene.carMesh.frontAxisMesh);
+    meshDelete(sScene.carMesh.backAxisMesh);
+    meshDelete(sScene.carMesh.frontLeftWheelMesh);
+    meshDelete(sScene.carMesh.frontRightWheelMesh);
+    meshDelete(sScene.carMesh.backLeftWheelMesh);
+    meshDelete(sScene.carMesh.backRightWheelMesh);
 
     /* cleanup glfw/glcontext */
     windowDelete(window);
