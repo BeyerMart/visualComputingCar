@@ -69,3 +69,41 @@ inline static const std::vector<unsigned int> indices =
     2, 3, 0
 };
 }
+
+/* car geometry */
+namespace unitCube
+{
+    inline static const std::vector<Vector3D> vertexPos =
+    {
+        {-1.0f, -1.0f, 1.0f},
+        {-1.0f,  1.0f, 1.0f},
+        { 1.0f,  1.0f, 1.0f},
+        { 1.0f, -1.0f, 1.0f},
+
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f,  1.0f, -1.0f},
+        { 1.0f,  1.0f, -1.0f},
+        { 1.0f, -1.0f, -1.0f}
+    };
+
+    inline static const std::vector<unsigned int> indices =
+    {
+        0, 1, 2,
+        2, 3, 0,
+
+        4, 5, 6,
+        6, 7, 4,
+
+        0, 1, 5,
+        5, 4, 0,
+
+        3, 2, 6,
+        6, 7, 3,
+
+        1, 5, 6,
+        6, 2, 1,
+
+        0, 4, 7,
+        7, 3, 0
+    };
+}
