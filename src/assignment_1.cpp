@@ -47,7 +47,8 @@ namespace scaledCar
     const Matrix4D frontRightWheelTransl = Matrix4D::translation({ 3.2f, -0.9f, 2.0f });
     const Matrix4D backLeftWheelTransl = Matrix4D::translation({ -2.8f, -0.9f, -2.0f });
     const Matrix4D backRightWheelTransl = Matrix4D::translation({ -2.8f, -0.9f, 2.0f });
-    const float carTurningAngle = 0.17;
+    const float carTurningAngle = 0.02;
+    const float carDrivingSpeed = 8.33;
 }
 
 struct car
@@ -232,7 +233,7 @@ void sceneInit(float width, float height)
 
     sScene.cubeSpinRadPerSecond = M_PI / 2.0f;
 
-    sScene.carDrivePerSecond = 1;
+    sScene.carDrivePerSecond = scaledCar::carDrivingSpeed;
 
     sScene.carScalingMatrix = scaledCar::scale;
     sScene.carTranslationMatrix = scaledCar::trans;
@@ -290,37 +291,36 @@ void sceneUpdate(float elapsedTime)
         //original cube rotation
         //sScene.cubeTransformationMatrix = Matrix4D::rotationX(rotationDirX * sScene.cubeSpinRadPerSecond * elapsedTime) * Matrix4D::rotationX(rotationDirY * sScene.cubeSpinRadPerSecond * elapsedTime) * sScene.cubeTransformationMatrix;
 
-
-
-        //car movement
-        sScene.carTranslationMatrix = Matrix4D::translation(rotationDirX * sScene.carDrivePerSecond * elapsedTime) * sScene.carTranslationMatrix;
-        //Rotation angle :alpha = deltaX / r // wheel spin
-        //printf("%f\n",scaledCar::wheelScale[0][0]);
-
         //tire rotation while driving
+        //Rotation angle :alpha = deltaX / r // wheel spin
         float alpha = ((sScene.carDrivePerSecond * elapsedTime) / (sScene.carMesh.wheelScalingMatrix[0][0] / 2)) * -1 * rotationDirX;
         sScene.carMesh.wheelTransformationMatrix = Matrix4D::rotationZ(alpha) * sScene.carMesh.wheelTransformationMatrix;
 
 
         //angle of the tires
+        //TODO
 
-        printf("%s\n", toString(sScene.carTransformationMatrix * sScene.carTranslationMatrix).c_str());
-        printf("-------- new --------\n");
-        //Vector3D position = Vector3D::Vector3D((sScene.carTransformationMatrix * sScene.carTranslationMatrix)[0][2], (sScene.carTransformationMatrix * sScene.carTranslationMatrix)[2][2], 1.0f);
-        //printf("%s\n", toString(position).c_str());
-        printf("-------- pos --------\n");
+ 
+        //car movement
+        float speed = rotationDirX * sScene.carDrivePerSecond * elapsedTime;
+        Vector3D forwardVect = Vector3D(speed, 0, 0);
+        Vector4D dirVect = sScene.carTransformationMatrix * forwardVect;
+        printf("dirVect: %s\n", toString(dirVect).c_str());
+        sScene.carTranslationMatrix = sScene.carTranslationMatrix * Matrix4D::translation({ dirVect.x, dirVect.y, dirVect.z });
+
+
+
+        //printf("%s\n", toString(sScene.carTransformationMatrix).c_str());
+        //printf("-------- new --------\n");
+        //printf("-------- pos --------\n");
 
     }
 
     if (rotationDirX != 0 && rotationDirY != 0) {
         //turning
         float turningAnglePerMeter = carCalculateTurningAnglePerMeter(scaledCar::carTurningAngle, 3.0f, scaledCar::baseScale[2][2]) * rotationDirY;
-
-        //Vector3D position = Vector3D::Vector3D((sScene.carTransformationMatrix * sScene.carTranslationMatrix)[0][3], , (sScene.carTransformationMatrix * sScene.carTranslationMatrix)[2][2]);
-        Vector3D position = Vector3D::Vector3D(1.0, 1.0f, 2.0);
-        //printf("%s\n", toString(position).c_str());
-        //printf("-------- pos --------\n");
-        sScene.carTransformationMatrix = sScene.carTransformationMatrix * Matrix4D::rotationY(turningAnglePerMeter * sScene.carDrivePerSecond * elapsedTime);
+        Matrix4D rotationYMat = Matrix4D::rotationY(turningAnglePerMeter * sScene.carDrivePerSecond * elapsedTime);
+        sScene.carTransformationMatrix = sScene.carTransformationMatrix * rotationYMat;
     }
 
 }
@@ -351,13 +351,8 @@ void sceneDraw()
         //glBindVertexArray(sScene.cubeMesh.vao);
         //glDrawElements(GL_TRIANGLES, sScene.cubeMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
 
-        //shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carMesh.baseTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.baseScalingMatrix);
-        //shaderUniform(sScene.shaderColor, "checkerboard", false);
-        //glBindVertexArray(sScene.carMesh.baseMesh.vao);
-        //glDrawElements(GL_TRIANGLES, sScene.carMesh.baseMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
-
         /* draw base of the car */ //one by one... not happy
-        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.baseTranslationMatrix * sScene.carMesh.baseScalingMatrix);
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix *  sScene.carMesh.baseTranslationMatrix * sScene.carMesh.baseScalingMatrix);
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.carMesh.baseMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.carMesh.baseMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
@@ -367,12 +362,6 @@ void sceneDraw()
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.carMesh.topMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.carMesh.topMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
-
-        /* draw top of the car */
-        //shaderUniform(sScene.shaderColor, "uModel", sScene.carTransformationMatrix * sScene.carMesh.topTranslationMatrix * sScene.carTranslationMatrix * sScene.carMesh.topScalingMatrix * sScene.carScalingMatrix);
-        //shaderUniform(sScene.shaderColor, "checkerboard", false);
-        //glBindVertexArray(sScene.carMesh.topMesh.vao);
-        //glDrawElements(GL_TRIANGLES, sScene.carMesh.topMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
 
         /* draw spare tire of the car */
         shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.spareTranslationMatrix  * sScene.carMesh.spareScalingMatrix * sScene.carScalingMatrix);
