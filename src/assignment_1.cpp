@@ -116,7 +116,7 @@ struct
 {
     bool mouseLeftButtonPressed = false;
     Vector2D mousePressStart;
-    bool buttonPressed[4] = { false, false, false, false };
+    bool buttonPressed[5] = { false, false, false, false, false };
 } sInput;
 
 /* calculate how much the car approximately turns per meter travelled for a given turning angle */
@@ -161,6 +161,10 @@ void callbackKey(GLFWwindow* window, int key, int scancode, int action, int mods
     if (key == GLFW_KEY_D)
     {
         sInput.buttonPressed[3] = (action == GLFW_PRESS || action == GLFW_REPEAT);
+    }
+    if (key == GLFW_KEY_LEFT_SHIFT)
+    {
+        sInput.buttonPressed[4] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
 }
 
@@ -276,12 +280,20 @@ void sceneUpdate(float elapsedTime)
 
     /* if 'a' or 'd' pressed, cube should rotate around y axis */
     int rotationDirY = 0;
-    if (sInput.buttonPressed[2]) {
+    if (sInput.buttonPressed[3]) {
         rotationDirY = -1;
     }
-    else if (sInput.buttonPressed[3]) {
+    else if (sInput.buttonPressed[2]) {
         rotationDirY = 1;
     }
+    /* if shift, then double the speed */
+    if (sInput.buttonPressed[4]) {
+        sScene.carDrivePerSecond = 2 * scaledCar::carDrivingSpeed;
+    }
+    else {
+        sScene.carDrivePerSecond = scaledCar::carDrivingSpeed;
+    }
+
    
 
 
