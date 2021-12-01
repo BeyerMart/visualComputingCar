@@ -49,6 +49,7 @@ namespace scaledCar
     const Matrix4D backRightWheelTransl = Matrix4D::translation({ -2.8f, -0.9f, 2.0f });
     const float carTurningAngle = 0.02;
     const float carDrivingSpeed = 8.33;
+    const float carWheelSteeringAngle = M_PI / 7.0f;
 }
 
 struct car
@@ -79,6 +80,8 @@ struct car
     Mesh backRightWheelMesh;
     Matrix4D backRightWheelTranslationMatrix;
     Matrix4D wheelTransformationMatrix;
+
+    Matrix4D frontAxisTransformationMatrix;
 
 }sCar;
 
@@ -261,6 +264,7 @@ void sceneInit(float width, float height)
     sScene.carMesh.backRightWheelTranslationMatrix = scaledCar::backRightWheelTransl;
 
     sScene.carMesh.wheelTransformationMatrix = Matrix4D::identity();
+    sScene.carMesh.frontAxisTransformationMatrix = Matrix4D::identity();
 
     /* load shader from file */
     sScene.shaderColor = shaderLoad("shader/default.vert", "shader/default.frag");
@@ -296,6 +300,7 @@ void sceneUpdate(float elapsedTime)
 
    
 
+    float turningAnglePerMeter = carCalculateTurningAnglePerMeter(scaledCar::carTurningAngle, 3.0f, scaledCar::baseScale[2][2]);
 
     /* udpate cube transformation matrix to include new rotation if one of the keys was pressed */
     if (rotationDirX != 0 || rotationDirY != 0) {
@@ -310,16 +315,17 @@ void sceneUpdate(float elapsedTime)
 
 
         //angle of the tires
-        //TODO
+        sScene.carMesh.frontAxisTransformationMatrix = Matrix4D::rotationY(scaledCar::carWheelSteeringAngle * rotationDirY);
 
- 
+
         //car movement
         float speed = rotationDirX * sScene.carDrivePerSecond * elapsedTime;
         Vector3D forwardVect = Vector3D(speed, 0, 0);
         Vector4D dirVect = sScene.carTransformationMatrix * forwardVect;
         printf("dirVect: %s\n", toString(dirVect).c_str());
+        
         sScene.carTranslationMatrix = sScene.carTranslationMatrix * Matrix4D::translation({ dirVect.x, dirVect.y, dirVect.z });
-
+        
 
 
         //printf("%s\n", toString(sScene.carTransformationMatrix).c_str());
@@ -327,11 +333,14 @@ void sceneUpdate(float elapsedTime)
         //printf("-------- pos --------\n");
 
     }
+    else {
+        // resetting the tires
+        sScene.carMesh.frontAxisTransformationMatrix = Matrix4D::identity();
+    }
 
     if (rotationDirX != 0 && rotationDirY != 0) {
         //turning
-        float turningAnglePerMeter = carCalculateTurningAnglePerMeter(scaledCar::carTurningAngle, 3.0f, scaledCar::baseScale[2][2]) * rotationDirY;
-        Matrix4D rotationYMat = Matrix4D::rotationY(turningAnglePerMeter * sScene.carDrivePerSecond * elapsedTime);
+        Matrix4D rotationYMat = Matrix4D::rotationY(turningAnglePerMeter * rotationDirY * rotationDirX * sScene.carDrivePerSecond * elapsedTime);
         sScene.carTransformationMatrix = sScene.carTransformationMatrix * rotationYMat;
     }
 
@@ -364,7 +373,7 @@ void sceneDraw()
         //glDrawElements(GL_TRIANGLES, sScene.cubeMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
 
         /* draw base of the car */ //one by one... not happy
-        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix *  sScene.carMesh.baseTranslationMatrix * sScene.carMesh.baseScalingMatrix);
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.baseTranslationMatrix * sScene.carMesh.baseScalingMatrix);
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.carMesh.baseMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.carMesh.baseMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
@@ -394,19 +403,19 @@ void sceneDraw()
         glDrawElements(GL_TRIANGLES, sScene.carMesh.backAxisMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
 
         /* draw front left wheel of the car */
-        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.frontLeftWheelTranslationMatrix *  sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix * sScene.carMesh.wheelTransformationMatrix);
+        shaderUniform(sScene.shaderColor, "uModel",sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.frontLeftWheelTranslationMatrix * sScene.carMesh.frontAxisTransformationMatrix * sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix * sScene.carMesh.wheelTransformationMatrix);
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.carMesh.frontLeftWheelMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.carMesh.frontLeftWheelMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
 
         /* draw front right wheel of the car */
-        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.frontRightWheelTranslationMatrix *  sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix * sScene.carMesh.wheelTransformationMatrix);
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.frontRightWheelTranslationMatrix * sScene.carMesh.frontAxisTransformationMatrix * sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix * sScene.carMesh.wheelTransformationMatrix);
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.carMesh.frontRightWheelMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.carMesh.frontRightWheelMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
 
         /* draw back left wheel of the car */
-        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.backLeftWheelTranslationMatrix *  sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix * sScene.carMesh.wheelTransformationMatrix);
+        shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix *  sScene.carMesh.backLeftWheelTranslationMatrix * sScene.carMesh.wheelScalingMatrix * sScene.carScalingMatrix * sScene.carMesh.wheelTransformationMatrix);
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.carMesh.backLeftWheelMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.carMesh.backLeftWheelMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
