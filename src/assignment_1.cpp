@@ -91,6 +91,7 @@ struct
     /* camera */
     Camera camera;
     float zoomSpeedMultiplier;
+    int cameraMode;
 
     /* plane mesh and transformation */
     Mesh planeMesh;
@@ -119,7 +120,7 @@ struct
 {
     bool mouseLeftButtonPressed = false;
     Vector2D mousePressStart;
-    bool buttonPressed[5] = { false, false, false, false, false };
+    bool buttonPressed[7] = { false, false, false, false, false, false, false};
 } sInput;
 
 /* calculate how much the car approximately turns per meter travelled for a given turning angle */
@@ -169,14 +170,20 @@ void callbackKey(GLFWwindow* window, int key, int scancode, int action, int mods
     {
         sInput.buttonPressed[4] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
+    /* input for camera control */
+    if (key == GLFW_KEY_1) {
+        sInput.buttonPressed[5] = (action == GLFW_PRESS || action == GLFW_REPEAT);
+    }
+    if (key == GLFW_KEY_2) {
+        sInput.buttonPressed[6] = (action == GLFW_PRESS || action == GLFW_REPEAT);
+    }
 }
 
 /* GLFW callback function for mouse position events */
 void callbackMousePos(GLFWwindow* window, double x, double y)
 {
     /* called on cursor position change */
-    if (sInput.mouseLeftButtonPressed)
-    {
+    if (sInput.mouseLeftButtonPressed && sScene.cameraMode == 1) {
         Vector2D diff = sInput.mousePressStart - Vector2D(x, y);
         cameraUpdateOrbit(sScene.camera, diff, 0.0f);
         sInput.mousePressStart = Vector2D(x, y);
@@ -213,8 +220,9 @@ void callbackWindowResize(GLFWwindow* window, int width, int height)
 void sceneInit(float width, float height)
 {
     /* initialize camera */
-    sScene.camera = cameraCreate(width, height, 75.0f, 0.01f, 500.0f, { 20.0f, 10.0f, 20.0f }, { 0.0f, 4.0f, 0.0f });
+    sScene.camera = cameraCreate(width, height, 75.0f, 0.01f, 500.0f, { 20.0f, 10.0f, 20.0f }, { 0.0f, 0.0f, 0.0f });
     sScene.zoomSpeedMultiplier = 0.05f;
+    sScene.cameraMode = 1;
 
     /* create opengl buffers for mesh */
     sScene.planeMesh = meshCreate(quad::vertexPos, quad::indices, groundPlane::color);
@@ -298,6 +306,13 @@ void sceneUpdate(float elapsedTime)
         sScene.carDrivePerSecond = scaledCar::carDrivingSpeed;
     }
 
+    /* if 1 static cam, 2 follow cam */
+    if (sInput.buttonPressed[5]) {
+        sScene.cameraMode = 1;
+    }
+    if (sInput.buttonPressed[6]) {
+        sScene.cameraMode = 2;
+    }
    
 
     float turningAnglePerMeter = carCalculateTurningAnglePerMeter(scaledCar::carTurningAngle, 3.0f, scaledCar::baseScale[2][2]);
@@ -322,7 +337,7 @@ void sceneUpdate(float elapsedTime)
         float speed = rotationDirX * sScene.carDrivePerSecond * elapsedTime;
         Vector3D forwardVect = Vector3D(speed, 0, 0);
         Vector4D dirVect = sScene.carTransformationMatrix * forwardVect;
-        printf("dirVect: %s\n", toString(dirVect).c_str());
+        //printf("dirVect: %s\n", toString(dirVect).c_str());
         
         sScene.carTranslationMatrix = sScene.carTranslationMatrix * Matrix4D::translation({ dirVect.x, dirVect.y, dirVect.z });
         
@@ -337,13 +352,20 @@ void sceneUpdate(float elapsedTime)
         // resetting the tires
         sScene.carMesh.frontAxisTransformationMatrix = Matrix4D::identity();
     }
-
+    //turning
     if (rotationDirX != 0 && rotationDirY != 0) {
-        //turning
         Matrix4D rotationYMat = Matrix4D::rotationY(turningAnglePerMeter * rotationDirY * rotationDirX * sScene.carDrivePerSecond * elapsedTime);
         sScene.carTransformationMatrix = sScene.carTransformationMatrix * rotationYMat;
     }
 
+    if (sScene.cameraMode == 2) {
+
+        //cameraUpdateOrbit(sScene.camera, diff, 0.0f);
+        //printf("\n--CAR---\n%s", toString(sScene.carTranslationMatrix).c_str());
+        //printf("\n--CAM-lokat--\n%s", toString(sScene.camera.lookAt).c_str());
+
+        sScene.camera.lookAt = { sScene.carTranslationMatrix[3][0], sScene.carTranslationMatrix[3][1], sScene.carTranslationMatrix[3][2] }; //no idea, why the indizes are f***ed up.
+    }
 }
 
 /* function to draw all objects in the scene */
