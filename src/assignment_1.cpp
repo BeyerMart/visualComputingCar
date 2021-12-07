@@ -26,23 +26,24 @@ namespace scaledCube
 /* translation, scale and color for the car */
 namespace scaledCar
 {
-    const Vector4D brownColor = { 0.396f, 0.263f, 0.129f, 1.0f }; // for the base
-    const Vector4D orangeColor = { 1.0f, 0.647f, 0.0f, 1.0f }; // for the top
-    const Vector4D blackColor = { 0.05f, 0.05f, 0.05f, 1.0f }; // for the wheels and the axis
+    const Vector4D brownColor = { 0.396f, 0.263f, 0.129f, 1.0f }; // BASE of the car
+    const Vector4D orangeColor = { 1.0f, 0.647f, 0.0f, 1.0f }; // TOP of the car
+    const Vector4D blackColor = { 0.05f, 0.05f, 0.05f, 1.0f }; // WHEELS and AXIS of the car
 
+    /* sizes may differ from the one's in the instruction */    
     const Matrix4D scale = Matrix4D::scale(1.0f, 1.0f, 1.0f);
-    const Matrix4D trans = Matrix4D::translation({ 0.0f, 1.7f, 0.0f }); //height of 1.2 should be correct (0.8 + 0.4)
-    const Matrix4D baseScale = Matrix4D::scale(4.6f, 0.8f, 1.8f);  // original but to save rotations / transformations left is choosen: Matrix4D::scale(0.8f, 4.6f, 1.8f);
-    const Matrix4D baseTransl = Matrix4D::translation({ 0.0f, 0.0f, 0.0f }); //lets assume it is in the center of the car
+    const Matrix4D trans = Matrix4D::translation({ 0.0f, 1.7f, 0.0f });
+    const Matrix4D baseScale = Matrix4D::scale(4.6f, 0.8f, 1.8f);
+    const Matrix4D baseTransl = Matrix4D::translation({ 0.0f, 0.0f, 0.0f }); 
     const Matrix4D topScale = Matrix4D::scale(3.6f, 0.8f, 1.8f);
-    const Matrix4D topTransl = Matrix4D::translation({ -1.0f, 1.6f, 0.0f }); //lets assume it is in the center of the car // 1.6 is 2*0.8?
+    const Matrix4D topTransl = Matrix4D::translation({ -1.0f, 1.6f, 0.0f }); 
     const Matrix4D spareScale = Matrix4D::scale(0.225f, 0.6f, 0.6f);
-    const Matrix4D spareTransl = Matrix4D::translation({ -4.8f, 0.7f, 0.0f }); // ATTENTION When changing total hight of car, 1.1 - hight?? // I don't get it, please recalculate
-    const Matrix4D frontAxisScale = Matrix4D::scale(0.2f, 0.2f, 1.9f); // z shoud be 1.8
-    const Matrix4D frontAxisTransl = Matrix4D::translation({ 3.2f, -0.9f, 0.0f }); // height: 0.3 - car height (1.2) // BUT needs FIXING
-    const Matrix4D backAxisScale = Matrix4D::scale(0.2f, 0.2f, 1.9f); // z shoud be 1.8
-    const Matrix4D backAxisTransl = Matrix4D::translation({ -2.8f, -0.9f, 0.0f }); // height: 0.3 - car height (1.2) // BUT needs FIXING
-    const Matrix4D wheelScale = Matrix4D::scale(0.6f, 0.6f, 0.225f); //->radius  0.3
+    const Matrix4D spareTransl = Matrix4D::translation({ -4.8f, 0.7f, 0.0f });
+    const Matrix4D frontAxisScale = Matrix4D::scale(0.2f, 0.2f, 1.9f);
+    const Matrix4D frontAxisTransl = Matrix4D::translation({ 3.2f, -0.9f, 0.0f }); 
+    const Matrix4D backAxisScale = Matrix4D::scale(0.2f, 0.2f, 1.9f); 
+    const Matrix4D backAxisTransl = Matrix4D::translation({ -2.8f, -0.9f, 0.0f }); 
+    const Matrix4D wheelScale = Matrix4D::scale(0.6f, 0.6f, 0.225f); 
     const Matrix4D frontLeftWheelTransl = Matrix4D::translation({ 3.2f, -0.9f, -2.0f });
     const Matrix4D frontRightWheelTransl = Matrix4D::translation({ 3.2f, -0.9f, 2.0f });
     const Matrix4D backLeftWheelTransl = Matrix4D::translation({ -2.8f, -0.9f, -2.0f });
@@ -166,6 +167,7 @@ void callbackKey(GLFWwindow* window, int key, int scancode, int action, int mods
     {
         sInput.buttonPressed[3] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
+    /* shift for momentary increase of speed */
     if (key == GLFW_KEY_LEFT_SHIFT)
     {
         sInput.buttonPressed[4] = (action == GLFW_PRESS || action == GLFW_REPEAT);
@@ -237,7 +239,6 @@ void sceneInit(float width, float height)
     sScene.carMesh.backLeftWheelMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
     sScene.carMesh.backRightWheelMesh = meshCreate(unitCube::vertexPos, unitCube::indices, scaledCar::blackColor);
 
-
     /* setup transformation matrices for objects */
     sScene.planeModelMatrix = groundPlane::trans * groundPlane::scale;
 
@@ -306,32 +307,28 @@ void sceneUpdate(float elapsedTime)
         sScene.carDrivePerSecond = scaledCar::carDrivingSpeed;
     }
 
-    /* if 1 static cam, 2 follow cam */
+    /* static cam */
     if (sInput.buttonPressed[5]) {
         sScene.cameraMode = 1;
     }
+    /* following camera */
     if (sInput.buttonPressed[6]) {
         sScene.cameraMode = 2;
     }
    
+    /* Rotation angle : alpha = deltaX / r // wheel spin */
+    float alpha = ((sScene.carDrivePerSecond * elapsedTime) / (sScene.carMesh.wheelScalingMatrix[0][0] / 2)) * -1 * rotationDirX;
 
     float turningAnglePerMeter = carCalculateTurningAnglePerMeter(scaledCar::carTurningAngle, 3.0f, scaledCar::baseScale[2][2]);
 
     /* udpate cube transformation matrix to include new rotation if one of the keys was pressed */
     if (rotationDirX != 0 || rotationDirY != 0) {
 
-        //original cube rotation
-        //sScene.cubeTransformationMatrix = Matrix4D::rotationX(rotationDirX * sScene.cubeSpinRadPerSecond * elapsedTime) * Matrix4D::rotationX(rotationDirY * sScene.cubeSpinRadPerSecond * elapsedTime) * sScene.cubeTransformationMatrix;
-
         //tire rotation while driving
-        //Rotation angle :alpha = deltaX / r // wheel spin
-        float alpha = ((sScene.carDrivePerSecond * elapsedTime) / (sScene.carMesh.wheelScalingMatrix[0][0] / 2)) * -1 * rotationDirX;
         sScene.carMesh.wheelTransformationMatrix = Matrix4D::rotationZ(alpha) * sScene.carMesh.wheelTransformationMatrix;
-
 
         //angle of the tires
         sScene.carMesh.frontAxisTransformationMatrix = Matrix4D::rotationY(scaledCar::carWheelSteeringAngle * rotationDirY);
-
 
         //car movement
         float speed = rotationDirX * sScene.carDrivePerSecond * elapsedTime;
@@ -340,31 +337,20 @@ void sceneUpdate(float elapsedTime)
         //printf("dirVect: %s\n", toString(dirVect).c_str());
         
         sScene.carTranslationMatrix = sScene.carTranslationMatrix * Matrix4D::translation({ dirVect.x, dirVect.y, dirVect.z });
-        
-
-
-        //printf("%s\n", toString(sScene.carTransformationMatrix).c_str());
-        //printf("-------- new --------\n");
-        //printf("-------- pos --------\n");
-
     }
+    /* resetting the tires */
     else {
-        // resetting the tires
         sScene.carMesh.frontAxisTransformationMatrix = Matrix4D::identity();
     }
-    //turning
+    /* turning */
     if (rotationDirX != 0 && rotationDirY != 0) {
         Matrix4D rotationYMat = Matrix4D::rotationY(turningAnglePerMeter * rotationDirY * rotationDirX * sScene.carDrivePerSecond * elapsedTime);
         sScene.carTransformationMatrix = sScene.carTransformationMatrix * rotationYMat;
     }
 
     if (sScene.cameraMode == 2) {
-
-        //cameraUpdateOrbit(sScene.camera, diff, 0.0f);
-        //printf("\n--CAR---\n%s", toString(sScene.carTranslationMatrix).c_str());
-        //printf("\n--CAM-lokat--\n%s", toString(sScene.camera.lookAt).c_str());
-
-        sScene.camera.lookAt = { sScene.carTranslationMatrix[3][0], sScene.carTranslationMatrix[3][1], sScene.carTranslationMatrix[3][2] }; //no idea, why the indizes are f***ed up.
+        // no idea, why the indizes are messed up (x and y axis shouldn't be [3][0] and [3][1] according to several debug prints)
+        sScene.camera.lookAt = { sScene.carTranslationMatrix[3][0], sScene.carTranslationMatrix[3][1], sScene.carTranslationMatrix[3][2] };
     }
 }
 
@@ -388,13 +374,19 @@ void sceneDraw()
         glBindVertexArray(sScene.planeMesh.vao);
         glDrawElements(GL_TRIANGLES, sScene.planeMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
 
-        /* draw cube, requires to calculate the final model matrix from all transformations */
-        //shaderUniform(sScene.shaderColor, "uModel", sScene.cubeTranslationMatrix * sScene.cubeTransformationMatrix * sScene.cubeScalingMatrix);
-        //shaderUniform(sScene.shaderColor, "checkerboard", false);
-        //glBindVertexArray(sScene.cubeMesh.vao);
-        //glDrawElements(GL_TRIANGLES, sScene.cubeMesh.size_ibo, GL_UNSIGNED_INT, nullptr);
+        /* draw cube, requires to calculate the final model matrix from all transformations 
+        shaderUniform(sScene.shaderColor, "uModel", sScene.cubeTranslationMatrix * sScene.cubeTransformationMatrix * sScene.cubeScalingMatrix);
+        shaderUniform(sScene.shaderColor, "checkerboard", false);
+        glBindVertexArray(sScene.cubeMesh.vao);
+        glDrawElements(GL_TRIANGLES, sScene.cubeMesh.size_ibo, GL_UNSIGNED_INT, nullptr); */
 
-        /* draw base of the car */ //one by one... not happy
+
+        /**
+        * This section is currently done one by one.
+        * This might be more effective to loop through the different car parts in the future.
+        */
+
+        /* draw base of the car */
         shaderUniform(sScene.shaderColor, "uModel", sScene.carTranslationMatrix * sScene.carTransformationMatrix * sScene.carMesh.baseTranslationMatrix * sScene.carMesh.baseScalingMatrix);
         shaderUniform(sScene.shaderColor, "checkerboard", false);
         glBindVertexArray(sScene.carMesh.baseMesh.vao);
