@@ -138,6 +138,11 @@ void sceneDraw()
         {
             /* set material properties */
             shaderUniform(sScene.shader, "uMaterial.diffuse", material.diffuse);
+            shaderUniform(sScene.shader, "uMaterial.ambient", material.ambient);
+            shaderUniform(sScene.shader, "uMaterial.specular", material.specular);
+            shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
+
+
 
             glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*) (material.indexOffset*sizeof(unsigned int)) );
         }
@@ -151,6 +156,10 @@ void sceneDraw()
     {
         /* set material properties */
         shaderUniform(sScene.shader, "uMaterial.diffuse", material.diffuse);
+        shaderUniform(sScene.shader, "uMaterial.ambient", material.ambient);
+        shaderUniform(sScene.shader, "uMaterial.specular", material.specular);
+        shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
+        //printf("%s\n", toString(material.ambient).c_str());
 
         glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*) (material.indexOffset*sizeof(unsigned int)) );
     }
