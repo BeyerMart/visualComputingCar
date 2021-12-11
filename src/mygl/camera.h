@@ -21,7 +21,7 @@ struct Camera
  *
  * @param width Image width.
  * @param height Image height.
- * @param fov Field of view.
+ * @param fov Field of view (in rad).
  * @param nearPlane Plane defining closest points that get rendered.
  * @param farPlane Plane defining fardest points that get rendered.
  * @param initPos Initial position of camera.

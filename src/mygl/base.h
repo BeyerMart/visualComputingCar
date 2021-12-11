@@ -6,6 +6,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#define to_degrees(x) (x * 180.0 / M_PI)
+#define to_radians(x) (x * M_PI / 180.0)
+
 #include <string>
 
 #include "math/vector2d.h"

@@ -33,11 +33,11 @@ Matrix4D cameraProjection(const Camera &cam)
 Matrix4D cameraView(const Camera &cam)
 {
     Vector3D front = normalize(cam.lookAt - cam.position);
-    Vector3D left = normalize(cross(cam.initUp, front));
-    Vector3D up = normalize(cross(left, front));
+    Vector3D right = normalize(cross(front, cam.initUp));
+    Vector3D up = normalize(cross(right, front));
 
     Matrix4D rotation(
-             left.x,     left.y,     left.z,     0.0f,
+             right.x,     right.y,     right.z,     0.0f,
              up.x,       up.y,       up.z,       0.0f,
             -front.x,   -front.y,   -front.z,    0.0f,
              0.0f,       0.0f,       0.0f,       1.0f

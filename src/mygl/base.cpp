@@ -49,14 +49,9 @@ void screenshotToPNG(const std::string &filepath)
     stbi_write_png(filepath.c_str(), width, height, 4, data.data(), width * 4);
 }
 
-namespace detail
-{
-
 void glfw_error_callback(int error, const char* description)
 {
     std::cerr << "GLFW Error: " <<  description << std::endl;
-}
-
 }
 
 GLFWwindow* windowCreate(const std::string& title, unsigned int width = 1280, unsigned int height = 720)
@@ -69,7 +64,7 @@ GLFWwindow* windowCreate(const std::string& title, unsigned int width = 1280, un
     }
 
     /* set callback function for glfw error */
-    glfwSetErrorCallback(detail::glfw_error_callback);
+    glfwSetErrorCallback(glfw_error_callback);
 
 
     /*-------------- create window ----------------*/

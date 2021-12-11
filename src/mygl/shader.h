@@ -14,4 +14,7 @@ ShaderProgram shaderCreate(const std::string& vertexSource, const std::string& f
 void shaderDelete(const ShaderProgram& program);
 
 void shaderUniform(ShaderProgram& shader, const std::string& name, const Matrix4D& value);
+void shaderUniform(ShaderProgram& shader, const std::string& name, const Vector3D& vec);
+void shaderUniform(ShaderProgram& shader, const std::string& name, const Vector4D& vec);
 void shaderUniform(ShaderProgram& shader, const std::string& name, int value);
+void shaderUniform(ShaderProgram& shader, const std::string& name, float value);

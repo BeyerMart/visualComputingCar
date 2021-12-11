@@ -113,22 +113,50 @@ void shaderDelete(const ShaderProgram &program)
     glDeleteProgram(program.id);
 }
 
-void shaderUniform(ShaderProgram &shader, const std::string &name, const Matrix4D &value)
+
+namespace detail
+{
+
+GLint uniform_index(ShaderProgram &shader, const std::string &name)
 {
     GLint index = glGetUniformLocation(shader.id, name.c_str());
     if(index < 0)
     {
         throw std::runtime_error("[Shader] Couldn't set value for uniform " + name);
     }
+
+    return index;
+}
+
+}
+
+void shaderUniform(ShaderProgram &shader, const std::string &name, const Matrix4D& value)
+{
+    GLint index = detail::uniform_index(shader, name);
     glUniformMatrix4fv(index, 1, GL_FALSE, value.ptr());
 }
 
 void shaderUniform(ShaderProgram &shader, const std::string &name, int value)
 {
-    GLint index = glGetUniformLocation(shader.id, name.c_str());
-    if(index < 0)
-    {
-        throw std::runtime_error("[Shader] Couldn't set value for uniform " + name);
-    }
+    GLint index = detail::uniform_index(shader, name);
     glUniform1i(index, value);
+}
+
+void shaderUniform(ShaderProgram &shader, const std::string &name, const Vector3D& vec)
+{
+    GLint index = detail::uniform_index(shader, name);
+    glUniform3f(index, vec.x, vec.y, vec.z);
+}
+
+void shaderUniform(ShaderProgram &shader, const std::string &name, const Vector4D& vec)
+{
+    GLint index = detail::uniform_index(shader, name);
+
+    glUniform4f(index, vec.x, vec.y, vec.z, vec.w);
+}
+
+void shaderUniform(ShaderProgram &shader, const std::string &name, float value)
+{
+    GLint index = detail::uniform_index(shader, name);
+    glUniform1f(index, value);
 }
