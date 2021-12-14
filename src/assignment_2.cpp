@@ -25,6 +25,8 @@ struct
     bool keyPressed[Car::CONTROL_COUNT] = { false, false, false, false };
 } sInput;
 
+Vector3D globalDirectioalLightColorRGB;
+Vector3D globalDirectionalLightDirection;
 
 void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -57,6 +59,24 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int
     if(key == GLFW_KEY_P && action == GLFW_PRESS)
     {
         screenshotToPNG("screenshot.png");
+    }
+
+    if (key == GLFW_KEY_0 && action == GLFW_PRESS) //day
+    {
+        globalDirectioalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
+        globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
+    }
+
+    if (key == GLFW_KEY_9 && action == GLFW_PRESS) //evening
+    {
+        globalDirectioalLightColorRGB = Vector3D(1, 0.7, 0.3);
+        globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
+    }
+
+    if (key == GLFW_KEY_8 && action == GLFW_PRESS) //night
+    {
+        globalDirectioalLightColorRGB = Vector3D(0.1, 0.1, 0.4);
+        globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
     }
 }
 
@@ -104,6 +124,9 @@ void sceneInit()
     sScene.modelGround = modelLoad("assets/ground/ground.obj").front();
     sScene.shader = shaderLoad("shader/default.vert", "shader/color.frag");
     sScene.camera = cameraCreate(1280, 720, to_radians(45.0), 0.01, 100.0, {12.0, 4.0, 12.0});
+
+    globalDirectioalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
+    globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
 }
 
 void sceneUpdate(float dt)
@@ -125,6 +148,11 @@ void sceneDraw()
     shaderUniform(sScene.shader, "uView",  view);
     shaderUniform(sScene.shader, "uModel",  sScene.car.transformation);
 
+    shaderUniform(sScene.shader, "globalDirectioalLightColorRGB", globalDirectioalLightColorRGB);
+    shaderUniform(sScene.shader, "globalDirectionalLightDirection", globalDirectionalLightDirection);
+    shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
+
+
     /* render car */
     for(unsigned int i = 0; i < sScene.car.parts.size(); i++)
     {
@@ -133,7 +161,7 @@ void sceneDraw()
         glBindVertexArray(model.mesh.vao);
 
         shaderUniform(sScene.shader, "uModel", sScene.car.transformation * transform);
-
+     
         for(Material& material : model.material)
         {
             /* set material properties */

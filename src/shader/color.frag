@@ -22,11 +22,11 @@ in vec3 tNormal;
 in vec3 tFragPos;
 in vec2 tUV;
 float diffuseCoefficient = 1.0;
-vec3 globalDirectioalLightColorRGB = vec3(0.9,0.9,0.9);
-vec3 globalDirectionalLightDirection = vec3(1.0, 1.0, 0.0);
+uniform vec3 globalDirectioalLightColorRGB; //= vec3(0.9,0.0,0.0);
+uniform vec3 globalDirectionalLightDirection;// = vec3(1.0, 1.0, 0.0);
 
 float specularCoefficient = 0.1;
-
+uniform vec3 viewPosition;
 
 uniform Material uMaterial;
 
@@ -37,9 +37,14 @@ void main(void)
     diffuse = diffuseCoefficient * uMaterial.diffuse * globalDirectioalLightColorRGB * dot(tNormal, globalDirectioalLightColorRGB);
 
     //TODO per light source
-    // do not use globalDirectionalLightDirection, but dir (and color) of light source
+    //do not use globalDirectionalLightDirection, but dir (and color) of light source
     //not sure if dot(tNormal, globalDirectionalLightDirection) is the correct angle.
-    specular = specularCoefficient * uMaterial.specular * globalDirectioalLightColorRGB * pow(max (dot(tNormal, globalDirectionalLightDirection), 0.0), uMaterial.shininess); 
+    vec3 viewDir = normalize(viewPosition - tFragPos);
+    vec3 reflectDir = reflect(-globalDirectionalLightDirection, tNormal);
+
+
+    //specular = specularCoefficient * uMaterial.specular * globalDirectioalLightColorRGB * pow(max (dot(tNormal, globalDirectionalLightDirection), 0.0), uMaterial.shininess); 
+    specular = specularCoefficient * uMaterial.specular * globalDirectioalLightColorRGB * pow(max (dot(viewDir, reflectDir), 0.0), uMaterial.shininess * 2); 
 
     //fragColor = vec4(uMaterial.diffuse + ambient, 1.0);
     //fragColor = vec4(ambient + diffuse, 1.0);
