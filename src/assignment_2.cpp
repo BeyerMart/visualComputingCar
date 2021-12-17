@@ -28,6 +28,15 @@ struct
 Vector3D globalDirectioalLightColorRGB;
 Vector3D globalDirectionalLightDirection;
 
+struct PointLight
+{
+    Vector3D pointLightColor;
+    Vector3D position;
+};
+
+PointLight pointLights[4];
+
+
 void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     /* input for car control */
@@ -127,6 +136,11 @@ void sceneInit()
 
     globalDirectioalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
     globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
+    //TODO gescheit machen
+    pointLights[0] = {Vector3D(0,0,1), Vector3D(1,1,1)};
+    pointLights[1] = {Vector3D(1,1,1), Vector3D(0,1,0)};
+    pointLights[2] = {Vector3D(0,1,0), Vector3D(3,3,3)};
+    pointLights[3] = {Vector3D(1,0,0), Vector3D(1,0,0)};
 }
 
 void sceneUpdate(float dt)
@@ -147,11 +161,25 @@ void sceneDraw()
     shaderUniform(sScene.shader, "uProj",  proj);
     shaderUniform(sScene.shader, "uView",  view);
     shaderUniform(sScene.shader, "uModel",  sScene.car.transformation);
+    
 
-    shaderUniform(sScene.shader, "globalDirectioalLightColorRGB", globalDirectioalLightColorRGB);
+    //directional light
     shaderUniform(sScene.shader, "globalDirectionalLightDirection", globalDirectionalLightDirection);
-    shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
+    shaderUniform(sScene.shader, "globalDirectioalLightColorRGB", globalDirectioalLightColorRGB);
+    shaderUniform(sScene.shader, "uDirectionalLight.diffuse", globalDirectioalLightColorRGB);
+    shaderUniform(sScene.shader, "uDirectionalLight.specular", globalDirectioalLightColorRGB);
+    shaderUniform(sScene.shader, "viewPos", sScene.camera.position);
 
+    //point light
+    /*
+    shaderUniform(sScene.shader, "pointLights[0].position", pointLights[0].position);
+    shaderUniform(sScene.shader, "pointLights[0].ambient", pointLights[0].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[0].specular", pointLights[0].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[0].constant", 1.0f);
+    shaderUniform(sScene.shader, "pointLights[0].linear", 0.14f);
+    shaderUniform(sScene.shader, "pointLights[0].quadratic", 0.07f);
+    */
 
     /* render car */
     for(unsigned int i = 0; i < sScene.car.parts.size(); i++)
@@ -161,6 +189,7 @@ void sceneDraw()
         glBindVertexArray(model.mesh.vao);
 
         shaderUniform(sScene.shader, "uModel", sScene.car.transformation * transform);
+        
      
         for(Material& material : model.material)
         {
@@ -169,8 +198,6 @@ void sceneDraw()
             shaderUniform(sScene.shader, "uMaterial.ambient", material.ambient);
             shaderUniform(sScene.shader, "uMaterial.specular", material.specular);
             shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
-
-
 
             glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*) (material.indexOffset*sizeof(unsigned int)) );
         }
