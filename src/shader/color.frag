@@ -8,19 +8,20 @@ struct Material
     float shininess;
 };
 
-struct PointLight {    
+struct PointLight {
     vec3 position;
     
     float constant;
     float linear;
-    float quadratic;  
+    float quadratic;
 
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
 };  
-#define NR_POINT_LIGHTS 4  
+#define NR_POINT_LIGHTS 4
 uniform PointLight pointLights[NR_POINT_LIGHTS];
+//uniform vec3 pointLight;
 
 out vec4 fragColor;
 vec3 ambient;
@@ -55,11 +56,14 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uMaterial.shininess);
     // attenuation
     float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    
     // combine results
-    vec3 ambient  = k_a * uMaterial.ambient * globalAmbientLightColorRGB;
-    vec3 diffuse  = diffuseCoefficient * uMaterial.diffuse * globalDirectionalLightColorRGB * dot(tNormal, globalDirectionalLightColorRGB);
-    vec3 specular = specularCoefficient * uMaterial.specular * globalDirectionalLightColorRGB * pow(max (dot(viewDir, reflectDir), 0.0), uMaterial.shininess * 2); 
+    vec3 ambient  = light.ambient * k_a * uMaterial.ambient * globalAmbientLightColorRGB;
+    vec3 diffuse  = light.diffuse * diff * diffuseCoefficient * uMaterial.diffuse * globalDirectionalLightColorRGB * dot(tNormal, globalDirectionalLightColorRGB);
+    vec3 specular = light.specular * specularCoefficient * uMaterial.specular * spec * globalDirectionalLightColorRGB * pow(max (dot(viewDir, reflectDir), 0.0), uMaterial.shininess * 2);
+
+    
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
@@ -74,15 +78,16 @@ void main(void)
     // directional light
     ambient = k_a * uMaterial.ambient * globalAmbientLightColorRGB;
     diffuse = diffuseCoefficient * uMaterial.diffuse * globalDirectionalLightColorRGB * dot(tNormal, globalDirectionalLightColorRGB);
-    specular = specularCoefficient * uMaterial.specular * globalDirectionalLightColorRGB * pow(max (dot(viewDir, reflectDir), 0.0), uMaterial.shininess * 2); 
+    specular = specularCoefficient * uMaterial.specular * globalDirectionalLightColorRGB * pow(max (dot(viewDir, reflectDir), 0.0), uMaterial.shininess * 2);
 
-    vec3 result = ambient + (diffuse + specular);
+    vec3 result = (ambient + diffuse + specular);
 
     // point lights
-    for(int i = 0; i < NR_POINT_LIGHTS; i++) result += CalcPointLight(pointLights[i], tNormal, tFragPos, viewDir);
+    for(int i = 0; i < NR_POINT_LIGHTS; i++){
+        result += CalcPointLight(pointLights[i], tNormal, tFragPos, viewDir);
+    }
             
 
 
     fragColor = vec4(result, 1.0);
-
 }

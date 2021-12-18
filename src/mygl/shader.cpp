@@ -122,6 +122,7 @@ GLint uniform_index(ShaderProgram &shader, const std::string &name)
     GLint index = glGetUniformLocation(shader.id, name.c_str());
     if(index < 0)
     {
+        printf("Shader not found [CUSTOM MSG BY NICOLAS]");
         throw std::runtime_error("[Shader] Couldn't set value for uniform " + name);
     }
 
@@ -144,6 +145,7 @@ void shaderUniform(ShaderProgram &shader, const std::string &name, int value)
 
 void shaderUniform(ShaderProgram &shader, const std::string &name, const Vector3D& vec)
 {
+    //std::cout << "\n Name: " << name;
     GLint index = detail::uniform_index(shader, name);
     glUniform3f(index, vec.x, vec.y, vec.z);
 }

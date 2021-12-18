@@ -31,7 +31,7 @@ Vector3D globalDirectionalLightDirection;
 struct PointLight
 {
     Vector3D pointLightColor;
-    Vector3D position;
+    Vector3D pointLightPosition;
 };
 
 PointLight pointLights[4];
@@ -138,10 +138,12 @@ void sceneInit()
     globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
 
     //TODO gescheit machen
-    pointLights[0] = { Vector3D(0,0,1), Vector3D(1,1,1) };
-    pointLights[1] = { Vector3D(1,1,1), Vector3D(0,1,0) };
-    pointLights[2] = { Vector3D(0,1,0), Vector3D(3,3,3) };
-    pointLights[3] = { Vector3D(1,0,0), Vector3D(1,0,0) };
+    //white
+    pointLights[0] = { Vector3D(1,1,1), Vector3D(0.4, 1.0, 2.0) };
+    pointLights[1] = { Vector3D(1,1,1), Vector3D(-0.4, 1.0, 2.0) };
+    //red
+    pointLights[2] = { Vector3D(1,0,0), Vector3D(0.6, 1.0, -1.5) };
+    pointLights[3] = { Vector3D(1,0,0), Vector3D(-0.6, 1.0, -1.5) };
 
 }
 
@@ -166,18 +168,46 @@ void sceneDraw()
 
     shaderUniform(sScene.shader, "globalDirectionalLightColorRGB", globalDirectionalLightColorRGB);
     shaderUniform(sScene.shader, "globalDirectionalLightDirection", globalDirectionalLightDirection);
-    shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
-
 
     //point light
-    //shaderUniform(sScene.shader, "pointLights[0].position", pointLights[0].position);
-    //shaderUniform(sScene.shader, "pointLights[0].ambient", pointLights[0].pointLightColor);
-    //shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor);
-    //shaderUniform(sScene.shader, "pointLights[0].specular", pointLights[0].pointLightColor);
-    //shaderUniform(sScene.shader, "pointLights[0].constant", 1.0f);
-    //shaderUniform(sScene.shader, "pointLights[0].linear", 0.14f);
-    //shaderUniform(sScene.shader, "pointLights[0].quadratic", 0.07f);
+    shaderUniform(sScene.shader, "pointLights[0].position", pointLights[0].pointLightPosition);
+    shaderUniform(sScene.shader, "pointLights[0].ambient", pointLights[0].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor); 
+    shaderUniform(sScene.shader, "pointLights[0].specular", pointLights[0].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[0].constant", 1.0f);
+    shaderUniform(sScene.shader, "pointLights[0].linear", 0.09f);
+    shaderUniform(sScene.shader, "pointLights[0].quadratic", 0.032f);
 
+    shaderUniform(sScene.shader, "pointLights[1].position", pointLights[1].pointLightPosition);
+    shaderUniform(sScene.shader, "pointLights[1].ambient", pointLights[1].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[1].diffuse", pointLights[1].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[1].specular", pointLights[1].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[1].constant", 1.0f);
+    shaderUniform(sScene.shader, "pointLights[1].linear", 0.09f);
+    shaderUniform(sScene.shader, "pointLights[1].quadratic", 0.032f);
+
+    shaderUniform(sScene.shader, "pointLights[2].position", pointLights[2].pointLightPosition);
+    shaderUniform(sScene.shader, "pointLights[2].ambient", pointLights[2].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[2].diffuse", pointLights[2].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[2].specular", pointLights[2].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[2].constant", 1.0f);
+    shaderUniform(sScene.shader, "pointLights[2].linear", 0.09f);
+    shaderUniform(sScene.shader, "pointLights[2].quadratic", 0.032f);
+
+    shaderUniform(sScene.shader, "pointLights[3].position", pointLights[3].pointLightPosition);
+    shaderUniform(sScene.shader, "pointLights[3].ambient", pointLights[3].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[3].diffuse", pointLights[3].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[3].specular", pointLights[3].pointLightColor);
+    shaderUniform(sScene.shader, "pointLights[3].constant", 1.0f);
+    shaderUniform(sScene.shader, "pointLights[3].linear", 0.09f);
+    shaderUniform(sScene.shader, "pointLights[3].quadratic", 0.032f);
+
+    
+
+
+
+
+    shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
 
     /* render car */
     for (unsigned int i = 0; i < sScene.car.parts.size(); i++)
