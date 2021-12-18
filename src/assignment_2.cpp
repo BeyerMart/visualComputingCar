@@ -25,7 +25,7 @@ struct
     bool keyPressed[Car::CONTROL_COUNT] = { false, false, false, false };
 } sInput;
 
-Vector3D globalDirectioalLightColorRGB;
+Vector3D globalDirectionalLightColorRGB;
 Vector3D globalDirectionalLightDirection;
 
 struct PointLight
@@ -40,58 +40,58 @@ PointLight pointLights[4];
 void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     /* input for car control */
-    if(key == GLFW_KEY_W)
+    if (key == GLFW_KEY_W)
     {
         sInput.keyPressed[Car::FORWARD] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
-    if(key == GLFW_KEY_S)
+    if (key == GLFW_KEY_S)
     {
         sInput.keyPressed[Car::BACKWARD] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
 
-    if(key == GLFW_KEY_A)
+    if (key == GLFW_KEY_A)
     {
         sInput.keyPressed[Car::LEFT] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
-    if(key == GLFW_KEY_D)
+    if (key == GLFW_KEY_D)
     {
         sInput.keyPressed[Car::RIGHT] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
 
     /* close window on escape */
-    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
 
     /* make screenshot and save in work directory */
-    if(key == GLFW_KEY_P && action == GLFW_PRESS)
+    if (key == GLFW_KEY_P && action == GLFW_PRESS)
     {
         screenshotToPNG("screenshot.png");
     }
 
     if (key == GLFW_KEY_0 && action == GLFW_PRESS) //day
     {
-        globalDirectioalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
+        globalDirectionalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
         globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
     }
 
     if (key == GLFW_KEY_9 && action == GLFW_PRESS) //evening
     {
-        globalDirectioalLightColorRGB = Vector3D(1, 0.7, 0.3);
+        globalDirectionalLightColorRGB = Vector3D(1, 0.7, 0.3);
         globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
     }
 
     if (key == GLFW_KEY_8 && action == GLFW_PRESS) //night
     {
-        globalDirectioalLightColorRGB = Vector3D(0.1, 0.1, 0.4);
+        globalDirectionalLightColorRGB = Vector3D(0.1, 0.1, 0.4);
         globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
     }
 }
 
 void mouseCallbackPos(GLFWwindow* window, double x, double y)
 {
-    if(sInput.mouseButtonPressed)
+    if (sInput.mouseButtonPressed)
     {
         Vector2D diff = sInput.mousePressStart - Vector2D(x, y);
         cameraUpdateOrbit(sScene.camera, diff, 0.0f);
@@ -101,7 +101,7 @@ void mouseCallbackPos(GLFWwindow* window, double x, double y)
 
 void mouseCallbackButton(GLFWwindow* window, int button, int action, int mods)
 {
-    if(button == GLFW_MOUSE_BUTTON_LEFT)
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
     {
         sInput.mouseButtonPressed = (action == GLFW_PRESS);
 
@@ -113,7 +113,7 @@ void mouseCallbackButton(GLFWwindow* window, int button, int action, int mods)
 
 void windowCallbackScroll(GLFWwindow* window, double xoffset, double yoffset)
 {
-    cameraUpdateOrbit(sScene.camera, {0, 0}, 0.1 * yoffset);
+    cameraUpdateOrbit(sScene.camera, { 0, 0 }, 0.1 * yoffset);
 }
 
 
@@ -132,15 +132,17 @@ void sceneInit()
     sScene.car = carLoad("assets/jeep_lowpoly/jeep.obj");
     sScene.modelGround = modelLoad("assets/ground/ground.obj").front();
     sScene.shader = shaderLoad("shader/default.vert", "shader/color.frag");
-    sScene.camera = cameraCreate(1280, 720, to_radians(45.0), 0.01, 100.0, {12.0, 4.0, 12.0});
+    sScene.camera = cameraCreate(1280, 720, to_radians(45.0), 0.01, 100.0, { 12.0, 4.0, 12.0 });
 
-    globalDirectioalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
+    globalDirectionalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
     globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
+
     //TODO gescheit machen
-    pointLights[0] = {Vector3D(0,0,1), Vector3D(1,1,1)};
-    pointLights[1] = {Vector3D(1,1,1), Vector3D(0,1,0)};
-    pointLights[2] = {Vector3D(0,1,0), Vector3D(3,3,3)};
-    pointLights[3] = {Vector3D(1,0,0), Vector3D(1,0,0)};
+    pointLights[0] = { Vector3D(0,0,1), Vector3D(1,1,1) };
+    pointLights[1] = { Vector3D(1,1,1), Vector3D(0,1,0) };
+    pointLights[2] = { Vector3D(0,1,0), Vector3D(3,3,3) };
+    pointLights[3] = { Vector3D(1,0,0), Vector3D(1,0,0) };
+
 }
 
 void sceneUpdate(float dt)
@@ -158,40 +160,35 @@ void sceneDraw()
     Matrix4D view = cameraView(sScene.camera);
 
     glUseProgram(sScene.shader.id);
-    shaderUniform(sScene.shader, "uProj",  proj);
-    shaderUniform(sScene.shader, "uView",  view);
-    shaderUniform(sScene.shader, "uModel",  sScene.car.transformation);
-    
+    shaderUniform(sScene.shader, "uProj", proj);
+    shaderUniform(sScene.shader, "uView", view);
+    shaderUniform(sScene.shader, "uModel", sScene.car.transformation);
 
-    //directional light
+    shaderUniform(sScene.shader, "globalDirectionalLightColorRGB", globalDirectionalLightColorRGB);
     shaderUniform(sScene.shader, "globalDirectionalLightDirection", globalDirectionalLightDirection);
-    shaderUniform(sScene.shader, "globalDirectioalLightColorRGB", globalDirectioalLightColorRGB);
-    shaderUniform(sScene.shader, "uDirectionalLight.diffuse", globalDirectioalLightColorRGB);
-    shaderUniform(sScene.shader, "uDirectionalLight.specular", globalDirectioalLightColorRGB);
-    shaderUniform(sScene.shader, "viewPos", sScene.camera.position);
+    shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
+
 
     //point light
-    /*
-    shaderUniform(sScene.shader, "pointLights[0].position", pointLights[0].position);
-    shaderUniform(sScene.shader, "pointLights[0].ambient", pointLights[0].pointLightColor);
-    shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor);
-    shaderUniform(sScene.shader, "pointLights[0].specular", pointLights[0].pointLightColor);
-    shaderUniform(sScene.shader, "pointLights[0].constant", 1.0f);
-    shaderUniform(sScene.shader, "pointLights[0].linear", 0.14f);
-    shaderUniform(sScene.shader, "pointLights[0].quadratic", 0.07f);
-    */
+    //shaderUniform(sScene.shader, "pointLights[0].position", pointLights[0].position);
+    //shaderUniform(sScene.shader, "pointLights[0].ambient", pointLights[0].pointLightColor);
+    //shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor);
+    //shaderUniform(sScene.shader, "pointLights[0].specular", pointLights[0].pointLightColor);
+    //shaderUniform(sScene.shader, "pointLights[0].constant", 1.0f);
+    //shaderUniform(sScene.shader, "pointLights[0].linear", 0.14f);
+    //shaderUniform(sScene.shader, "pointLights[0].quadratic", 0.07f);
+
 
     /* render car */
-    for(unsigned int i = 0; i < sScene.car.parts.size(); i++)
+    for (unsigned int i = 0; i < sScene.car.parts.size(); i++)
     {
         Model& model = sScene.car.parts[i];
         Matrix4D& transform = sScene.car.partTranformation[i];
         glBindVertexArray(model.mesh.vao);
 
         shaderUniform(sScene.shader, "uModel", sScene.car.transformation * transform);
-        
-     
-        for(Material& material : model.material)
+
+        for (Material& material : model.material)
         {
             /* set material properties */
             shaderUniform(sScene.shader, "uMaterial.diffuse", material.diffuse);
@@ -199,7 +196,9 @@ void sceneDraw()
             shaderUniform(sScene.shader, "uMaterial.specular", material.specular);
             shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
 
-            glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*) (material.indexOffset*sizeof(unsigned int)) );
+
+
+            glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
         }
     }
 
@@ -207,7 +206,7 @@ void sceneDraw()
     shaderUniform(sScene.shader, "uModel", Matrix4D::identity());
     glBindVertexArray(sScene.modelGround.mesh.vao);
 
-    for(Material& material : sScene.modelGround.material)
+    for (Material& material : sScene.modelGround.material)
     {
         /* set material properties */
         shaderUniform(sScene.shader, "uMaterial.diffuse", material.diffuse);
@@ -216,7 +215,7 @@ void sceneDraw()
         shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
         //printf("%s\n", toString(material.ambient).c_str());
 
-        glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*) (material.indexOffset*sizeof(unsigned int)) );
+        glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
     }
 
     /* cleanup opengl state */
@@ -228,7 +227,7 @@ int main(int argc, char** argv)
 {
     /*---------- init window ------------*/
     GLFWwindow* window = windowCreate("Assignment 2 - Shading", 1280, 720);
-    if(!window) { return EXIT_FAILURE; }
+    if (!window) { return EXIT_FAILURE; }
 
     /* set window callbacks */
     glfwSetKeyCallback(window, keyboardCallback);
@@ -242,7 +241,7 @@ int main(int argc, char** argv)
     /*-------------- main loop ----------------*/
     double timeStamp = glfwGetTime();
     double timeStampNew = 0.0;
-    while(!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window))
     {
         /* poll and process input and window events */
         glfwPollEvents();
