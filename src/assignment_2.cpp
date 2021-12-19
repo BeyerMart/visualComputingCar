@@ -22,7 +22,7 @@ struct
     bool mouseButtonPressed = false;
     Vector2D mousePressStart;
 
-    bool keyPressed[Car::CONTROL_COUNT] = { false, false, false, false };
+    bool keyPressed[Car::CONTROL_COUNT + 1] = { false, false, false, false, true };
 } sInput;
 
 Vector3D globalDirectionalLightColorRGB;
@@ -86,6 +86,10 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int
     {
         globalDirectionalLightColorRGB = Vector3D(0.1, 0.1, 0.4);
         globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
+    }
+    if (key == GLFW_KEY_L && action == GLFW_PRESS)
+    {
+        sInput.keyPressed[Car::CONTROL_COUNT] = !sInput.keyPressed[Car::CONTROL_COUNT];
     }
 }
 
@@ -161,28 +165,58 @@ void sceneDraw()
     shaderUniform(sScene.shader, "globalDirectionalLightColorRGB", globalDirectionalLightColorRGB);
     shaderUniform(sScene.shader, "globalDirectionalLightDirection", globalDirectionalLightDirection);
 
+
+
+    // LIGHTS ON
+    if (sInput.keyPressed[Car::CONTROL_COUNT] == true) {
+        pointLights[0] = {
+            Vector3D(1,1,1),
+            Vector3D((sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).x,
+            (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).y,
+            (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).z)
+        };
+
+        pointLights[1] = {
+            Vector3D(1,1,1),
+            Vector3D((sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).x,
+            (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).y,
+            (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).z)
+        };
+
+        pointLights[2] = {
+            Vector3D(1,0,0),
+            Vector3D((sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).x,
+            (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).y,
+            (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).z)
+        };
+
+        pointLights[3] = {
+            Vector3D(1,0,0),
+            Vector3D((sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).x,
+            (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).y,
+            (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).z)
+        };
+
+    }
+
+    // LIGHTS OFF
+    if (sInput.keyPressed[Car::CONTROL_COUNT] == false) {
+        pointLights[0].pointLightColor = Vector3D(0, 0, 0);
+        pointLights[1].pointLightColor = Vector3D(0, 0, 0);
+        pointLights[2].pointLightColor = Vector3D(0, 0, 0);
+        pointLights[3].pointLightColor = Vector3D(0, 0, 0);
+    }
+    
     //first white light (front)
-    pointLights[0] = { 
-        Vector3D(1,1,1),
-        Vector3D((sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).x,
-        (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).y,
-        (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).z) 
-    };
     shaderUniform(sScene.shader, "pointLights[0].position", pointLights[0].pointLightPosition);
     shaderUniform(sScene.shader, "pointLights[0].ambient", pointLights[0].pointLightColor);
-    shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor); 
+    shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor);
     shaderUniform(sScene.shader, "pointLights[0].specular", pointLights[0].pointLightColor);
     shaderUniform(sScene.shader, "pointLights[0].constant", 1.0f);
     shaderUniform(sScene.shader, "pointLights[0].linear", 0.09f);
     shaderUniform(sScene.shader, "pointLights[0].quadratic", 0.032f);
 
     //second white light (front)
-    pointLights[1] = { 
-        Vector3D(1,1,1),
-        Vector3D((sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).x,
-            (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).y,
-            (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).z) 
-    };
     shaderUniform(sScene.shader, "pointLights[1].position", pointLights[1].pointLightPosition);
     shaderUniform(sScene.shader, "pointLights[1].ambient", pointLights[1].pointLightColor);
     shaderUniform(sScene.shader, "pointLights[1].diffuse", pointLights[1].pointLightColor);
@@ -192,11 +226,6 @@ void sceneDraw()
     shaderUniform(sScene.shader, "pointLights[1].quadratic", 0.032f);
 
     //first red light (back)
-    pointLights[2] = { 
-        Vector3D(1,0,0), 
-        Vector3D( (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).x, 
-        (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).y, (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).z) 
-    };
     shaderUniform(sScene.shader, "pointLights[2].position", pointLights[2].pointLightPosition);
     shaderUniform(sScene.shader, "pointLights[2].ambient", pointLights[2].pointLightColor);
     shaderUniform(sScene.shader, "pointLights[2].diffuse", pointLights[2].pointLightColor);
@@ -206,12 +235,6 @@ void sceneDraw()
     shaderUniform(sScene.shader, "pointLights[2].quadratic", 0.032f);
 
     //second red light (back)
-    pointLights[3] = { 
-        Vector3D(1,0,0), 
-        Vector3D((sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).x, 
-        (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).y, 
-        (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).z) 
-    };
     shaderUniform(sScene.shader, "pointLights[3].position", pointLights[3].pointLightPosition);
     shaderUniform(sScene.shader, "pointLights[3].ambient", pointLights[3].pointLightColor);
     shaderUniform(sScene.shader, "pointLights[3].diffuse", pointLights[3].pointLightColor);
@@ -219,11 +242,7 @@ void sceneDraw()
     shaderUniform(sScene.shader, "pointLights[3].constant", 1.0f);
     shaderUniform(sScene.shader, "pointLights[3].linear", 0.09f);
     shaderUniform(sScene.shader, "pointLights[3].quadratic", 0.032f);
-
     
-
-
-
 
     shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
 
