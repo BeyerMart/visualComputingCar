@@ -28,13 +28,14 @@ struct
 Vector3D globalDirectionalLightColorRGB;
 Vector3D globalDirectionalLightDirection;
 
-struct PointLight
+struct SpotLight
 {
-    Vector3D pointLightColor;
-    Vector3D pointLightPosition;
+    Vector3D color;
+    Vector3D position;
+    Vector3D direction;
 };
 
-PointLight pointLights[4];
+SpotLight spotLights[4];
 
 
 void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -169,95 +170,99 @@ void sceneDraw()
 
     // LIGHTS ON
     if (sInput.keyPressed[Car::CONTROL_COUNT] == true) {
-        pointLights[0] = {
-            Vector3D(1,1,1),
-            Vector3D((sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).x,
-            (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).y,
-            (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).z)
+        Vector4D fRotat = sScene.car.rotation * Vector4D(0, 0, 1, 1);
+        spotLights[0] = {
+            Vector3D(0.4,0.4,0.4),
+            Vector3D(
+                (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).x,
+                (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).y,
+                (sScene.car.transformation * Vector3D(0.4, 1.0, 2.0)).z
+            ),
+            Vector3D(fRotat.x, fRotat.y, fRotat.z)
         };
 
-        pointLights[1] = {
-            Vector3D(1,1,1),
-            Vector3D((sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).x,
-            (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).y,
-            (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).z)
+        spotLights[1] = {
+            Vector3D(0.4,0.4,0.4),
+            Vector3D(
+                (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).x,
+                (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).y,
+                (sScene.car.transformation * Vector3D(-0.4, 1.0, 2.0)).z
+            ),
+            Vector3D(fRotat.x, fRotat.y, fRotat.z),
+
+        };
+        Vector4D bRotat = sScene.car.rotation * Vector4D(0, 0, -1, 1);
+
+        spotLights[2] = {
+            Vector3D(0.4,0,0),
+            Vector3D(
+                (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).x,
+                (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).y,
+                (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).z
+            ),
+            Vector3D(bRotat.x, bRotat.y, bRotat.z),
         };
 
-        pointLights[2] = {
-            Vector3D(1,0,0),
-            Vector3D((sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).x,
-            (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).y,
-            (sScene.car.transformation * Vector3D(0.6, 1.0, -1.5)).z)
-        };
+        spotLights[3] = {
+            Vector3D(0.4,0,0),
+            Vector3D(
+                (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).x,
+                (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).y,
+                (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).z
+            ),
+            Vector3D(bRotat.x, bRotat.y, bRotat.z),
 
-        pointLights[3] = {
-            Vector3D(1,0,0),
-            Vector3D((sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).x,
-            (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).y,
-            (sScene.car.transformation * Vector3D(-0.6, 1.0, -1.5)).z)
         };
 
     }
 
     // LIGHTS OFF
     if (sInput.keyPressed[Car::CONTROL_COUNT] == false) {
-        pointLights[0].pointLightColor = Vector3D(0, 0, 0);
-        pointLights[1].pointLightColor = Vector3D(0, 0, 0);
-        pointLights[2].pointLightColor = Vector3D(0, 0, 0);
-        pointLights[3].pointLightColor = Vector3D(0, 0, 0);
+        spotLights[0].color = Vector3D(0, 0, 0);
+        spotLights[1].color = Vector3D(0, 0, 0);
+        spotLights[2].color = Vector3D(0, 0, 0);
+        spotLights[3].color = Vector3D(0, 0, 0);
     }
     
-    //first white light (front)
-    
-    // shaderUniform(sScene.shader, "pointLights[0].position", pointLights[0].pointLightPosition);
-    // shaderUniform(sScene.shader, "pointLights[0].ambient", pointLights[0].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[0].diffuse", pointLights[0].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[0].specular", pointLights[0].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[0].constant", 1.0f);
-    // shaderUniform(sScene.shader, "pointLights[0].linear", 0.09f);
-    // shaderUniform(sScene.shader, "pointLights[0].quadratic", 0.032f);
-
-    //second white light (front)
-    // shaderUniform(sScene.shader, "pointLights[1].position", pointLights[1].pointLightPosition);
-    // shaderUniform(sScene.shader, "pointLights[1].ambient", pointLights[1].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[1].diffuse", pointLights[1].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[1].specular", pointLights[1].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[1].constant", 1.0f);
-    // shaderUniform(sScene.shader, "pointLights[1].linear", 0.09f);
-    // shaderUniform(sScene.shader, "pointLights[1].quadratic", 0.032f);
-
-    //first red light (back)
-    // shaderUniform(sScene.shader, "pointLights[2].position", pointLights[2].pointLightPosition);
-    // shaderUniform(sScene.shader, "pointLights[2].ambient", pointLights[2].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[2].diffuse", pointLights[2].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[2].specular", pointLights[2].pointLightColor);
-    // shaderUniform(sScene.shader, "pointLights[2].constant", 1.0f);
-    // shaderUniform(sScene.shader, "pointLights[2].linear", 0.09f);W
-    // shaderUniform(sScene.shader, "pointLights[2].quadratic", 0.032f);
-
-    //second red light (back)
-    /*
-    shaderUniform(sScene.shader, "pointLights[3].position", pointLights[3].pointLightPosition);
-    shaderUniform(sScene.shader, "pointLights[3].ambient", pointLights[3].pointLightColor);
-    shaderUniform(sScene.shader, "pointLights[3].diffuse", pointLights[3].pointLightColor);
-    shaderUniform(sScene.shader, "pointLights[3].specular", pointLights[3].pointLightColor);
-    shaderUniform(sScene.shader, "pointLights[3].constant", 1.0f);
-    shaderUniform(sScene.shader, "pointLights[3].linear", 0.09f);
-    shaderUniform(sScene.shader, "pointLights[3].quadratic", 0.032f);
-    */
-    //shaderUniform(sScene.shader, "spotLights[0].color", Vector3D(0, 1, 0));
-    shaderUniform(sScene.shader, "spotLights[0].position", pointLights[3].pointLightPosition);
-    shaderUniform(sScene.shader, "spotLights[0].direction", Vector3D(1, 0, 0));
+    shaderUniform(sScene.shader, "spotLights[0].position", spotLights[0].position);
+    shaderUniform(sScene.shader, "spotLights[0].direction", spotLights[0].direction);
     shaderUniform(sScene.shader, "spotLights[0].cutoffAngle", 0.9f); //todo cos of angle
-    shaderUniform(sScene.shader, "spotLights[0].ambient", Vector3D(0.5, 0.1, 0.1));
-    shaderUniform(sScene.shader, "spotLights[0].diffuse", Vector3D(0, 1, 0));
-    shaderUniform(sScene.shader, "spotLights[0].specular", Vector3D(0, 0, 0.1));
+    shaderUniform(sScene.shader, "spotLights[0].ambient", spotLights[0].color);
+    shaderUniform(sScene.shader, "spotLights[0].diffuse", spotLights[0].color);
+    shaderUniform(sScene.shader, "spotLights[0].specular", spotLights[0].color);
     shaderUniform(sScene.shader, "spotLights[0].constant", 1.0f);
     shaderUniform(sScene.shader, "spotLights[0].linear", 0.09f);
     shaderUniform(sScene.shader, "spotLights[0].quadratic", 0.032f);
-    //shaderUniform(sScene.shader, "spotLight", 0.032f);
 
-    //shaderUniform(sScene.shader, "testVar", 0);
+    shaderUniform(sScene.shader, "spotLights[1].position", spotLights[1].position);
+    shaderUniform(sScene.shader, "spotLights[1].direction", spotLights[1].direction);
+    shaderUniform(sScene.shader, "spotLights[1].cutoffAngle", 0.9f); //todo cos of angle
+    shaderUniform(sScene.shader, "spotLights[1].ambient", spotLights[1].color);
+    shaderUniform(sScene.shader, "spotLights[1].diffuse", spotLights[1].color);
+    shaderUniform(sScene.shader, "spotLights[1].specular", spotLights[1].color);
+    shaderUniform(sScene.shader, "spotLights[1].constant", 1.0f);
+    shaderUniform(sScene.shader, "spotLights[1].linear", 0.09f);
+    shaderUniform(sScene.shader, "spotLights[1].quadratic", 0.032f);
+
+    shaderUniform(sScene.shader, "spotLights[2].position", spotLights[2].position);
+    shaderUniform(sScene.shader, "spotLights[2].direction", spotLights[2].direction);
+    shaderUniform(sScene.shader, "spotLights[2].cutoffAngle", 0.9f); //todo cos of angle
+    shaderUniform(sScene.shader, "spotLights[2].ambient", spotLights[2].color);
+    shaderUniform(sScene.shader, "spotLights[2].diffuse", spotLights[2].color);
+    shaderUniform(sScene.shader, "spotLights[2].specular", spotLights[2].color);
+    shaderUniform(sScene.shader, "spotLights[2].constant", 1.0f);
+    shaderUniform(sScene.shader, "spotLights[2].linear", 0.09f);
+    shaderUniform(sScene.shader, "spotLights[2].quadratic", 0.032f);
+
+    shaderUniform(sScene.shader, "spotLights[3].position", spotLights[3].position);
+    shaderUniform(sScene.shader, "spotLights[3].direction", spotLights[3].direction);
+    shaderUniform(sScene.shader, "spotLights[3].cutoffAngle", 0.9f); //todo cos of angle
+    shaderUniform(sScene.shader, "spotLights[3].ambient", spotLights[3].color);
+    shaderUniform(sScene.shader, "spotLights[3].diffuse", spotLights[3].color);
+    shaderUniform(sScene.shader, "spotLights[3].specular", spotLights[3].color);
+    shaderUniform(sScene.shader, "spotLights[3].constant", 1.0f);
+    shaderUniform(sScene.shader, "spotLights[3].linear", 0.09f);
+    shaderUniform(sScene.shader, "spotLights[3].quadratic", 0.032f);
 
     
     shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
