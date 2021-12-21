@@ -28,9 +28,7 @@ struct SpotLight {
   vec3 direction;
   float cutoffAngle;
 
-  vec3 ambient;
-  vec3 diffuse;
-  vec3 specular;
+  vec3 color;
 
   float constant;
   float linear;
@@ -104,25 +102,24 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         // attenuation
         float distance = length(light.position - fragPos);
         float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-        
-        /*
+         // /*
         // combine results
-        vec3 ambient  = light.ambient * k_a * uMaterial.ambient;
-        //vec3 ambient  = light.ambient * k_a * uMaterial.ambient * globalAmbientLightColorRGB;
-        vec3 diffuse  = light.diffuse * diff * diffuseCoefficient * uMaterial.diffuse * dot(tNormal, globalDirectionalLightColorRGB);
-        //vec3 diffuse  = light.diffuse * diff * diffuseCoefficient * uMaterial.diffuse * globalDirectionalLightColorRGB * dot(tNormal, globalDirectionalLightColorRGB);
-        vec3 specular = light.specular * specularCoefficient * uMaterial.specular * spec * pow(max(dot(viewDir, reflectDir), 0.0), uMaterial.shininess);
-        //vec3 specular = light.specular * specularCoefficient * uMaterial.specular * spec * globalDirectionalLightColorRGB * pow(max(dot(viewDir, reflectDir), 0.0), uMaterial.shininess);
+        vec3 ambient  = light.color * k_a * uMaterial.ambient;
+        //vec3 ambient  = light.color * k_a * uMaterial.ambient * globalAmbientLightColorRGB;
+        vec3 diffuse  = light.color * diff * diffuseCoefficient * uMaterial.diffuse * dot(tNormal, globalDirectionalLightColorRGB);
+        //vec3 diffuse  = light.color * diff * diffuseCoefficient * uMaterial.diffuse * globalDirectionalLightColorRGB * dot(tNormal, globalDirectionalLightColorRGB);
+        vec3 specular = light.color * specularCoefficient * uMaterial.specular * spec * pow(max(dot(viewDir, reflectDir), 0.0), uMaterial.shininess);
+        //vec3 specular = light.color * specularCoefficient * uMaterial.specular * spec * globalDirectionalLightColorRGB * pow(max(dot(viewDir, reflectDir), 0.0), uMaterial.shininess);
 
         ambient  *= attenuation;
         diffuse  *= attenuation;
         specular *= attenuation;
-        //return (ambient + diffuse + specular);
-        */
-        return (light.ambient * attenuation);
+        return (ambient + diffuse + specular);
+        //*/
+        //return (light.color * attenuation);
 
     } else {
-        //return light.ambient * uMaterial.ambient * globalAmbientLightColorRGB;
+        //return light.color * uMaterial.ambient * globalAmbientLightColorRGB;
         return vec3 (0.0, 0.0, 0.0);
     }
 
