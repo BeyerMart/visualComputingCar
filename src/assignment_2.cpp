@@ -191,7 +191,7 @@ void sceneDraw()
             Vector3D(fRotat.x, fRotat.y, fRotat.z),
 
         };
-        Vector4D bRotat = sScene.car.rotation * Vector4D(0, -0.1, -1, 1); //back lights rotation with car
+        Vector4D bRotat = sScene.car.rotation * Vector4D(0, -0.3, -1, 1); //back lights rotation with car
 
         spotLights[2] = {
             Vector3D(0.75,0,0),
