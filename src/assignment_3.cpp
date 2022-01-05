@@ -41,32 +41,32 @@ SpotLight spotLights[4];
 void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     /* input for car control */
-    if (key == GLFW_KEY_W)
+    if(key == GLFW_KEY_W)
     {
         sInput.keyPressed[Car::FORWARD] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
-    if (key == GLFW_KEY_S)
+    if(key == GLFW_KEY_S)
     {
         sInput.keyPressed[Car::BACKWARD] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
 
-    if (key == GLFW_KEY_A)
+    if(key == GLFW_KEY_A)
     {
         sInput.keyPressed[Car::LEFT] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
-    if (key == GLFW_KEY_D)
+    if(key == GLFW_KEY_D)
     {
         sInput.keyPressed[Car::RIGHT] = (action == GLFW_PRESS || action == GLFW_REPEAT);
     }
 
     /* close window on escape */
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
 
     /* make screenshot and save in work directory */
-    if (key == GLFW_KEY_P && action == GLFW_PRESS)
+    if(key == GLFW_KEY_P && action == GLFW_PRESS)
     {
         screenshotToPNG("screenshot.png");
     }
@@ -96,7 +96,7 @@ void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int
 
 void mouseCallbackPos(GLFWwindow* window, double x, double y)
 {
-    if (sInput.mouseButtonPressed)
+    if(sInput.mouseButtonPressed)
     {
         Vector2D diff = sInput.mousePressStart - Vector2D(x, y);
         cameraUpdateOrbit(sScene.camera, diff, 0.0f);
@@ -134,7 +134,7 @@ void sceneInit()
     /*---------- init opengl stuff ------------*/
     glEnable(GL_DEPTH_TEST);
 
-    sScene.car = carLoad("assets/jeep_lowpoly/jeep.obj");
+    sScene.car = carLoad("assets/jeep/jeep.obj");
     sScene.modelGround = modelLoad("assets/ground/ground.obj").front();
     sScene.shader = shaderLoad("shader/default.vert", "shader/color.frag");
     sScene.camera = cameraCreate(1280, 720, to_radians(45.0), 0.01, 100.0, { 12.0, 4.0, 12.0 });
@@ -318,8 +318,8 @@ void sceneDraw()
 int main(int argc, char** argv)
 {
     /*---------- init window ------------*/
-    GLFWwindow* window = windowCreate("Assignment 2 - Shading", 1280, 720);
-    if (!window) { return EXIT_FAILURE; }
+    GLFWwindow* window = windowCreate("Assignment 3 - Texturing", 1280, 720);
+    if(!window) { return EXIT_FAILURE; }
 
     /* set window callbacks */
     glfwSetKeyCallback(window, keyboardCallback);

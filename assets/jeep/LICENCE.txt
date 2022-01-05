@@ -1,0 +1,2 @@
+"Jeep Rubicon" (https://skfb.ly/6WTH8) by Armawiz is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+Modified by Nikolaus Rauch: removed inside, creation of .obj and .mat files, renamed/combined collections (with same material), modified and renamed materials, textures edited (body diffuse, light emission, roof_diffuse)

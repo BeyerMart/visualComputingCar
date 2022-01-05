@@ -130,6 +130,34 @@ std::map<std::string, Material> materialLoad(const std::string &filepath)
         {
             ss >> current->emission.x >> current->emission.y >> current->emission.z;
         }
+        /* diffuse color map */
+        else if(code == "map_Kd" && current)
+        {
+            std::string texture_path;
+            ss  >> texture_path;
+            current->map_diffuse = textureLoad(filepath.substr(0, filepath.find_last_of("\\/")) + "/" + texture_path);
+        }
+        /* ambient occlusion map */
+        else if(code == "map_Ka" && current)
+        {
+            std::string texture_path;
+            ss  >> texture_path;
+            current->map_ambient_occlusion = textureLoad(filepath.substr(0, filepath.find_last_of("\\/")) + "/" + texture_path);
+        }
+        /* ambient occlusion map */
+        else if(code == "map_Ks" && current)
+        {
+            std::string texture_path;
+            ss  >> texture_path;
+            current->map_specular = textureLoad(filepath.substr(0, filepath.find_last_of("\\/")) + "/" + texture_path);
+        }
+        /* ambient occlusion map */
+        else if(code == "map_Ke" && current)
+        {
+            std::string texture_path;
+            ss  >> texture_path;
+            current->map_emission = textureLoad(filepath.substr(0, filepath.find_last_of("\\/")) + "/" + texture_path);
+        }
     }
 
     return materials;

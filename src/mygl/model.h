@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mesh.h"
+#include "texture.h"
 
 struct Material
 {
@@ -11,6 +12,11 @@ struct Material
     Vector3D diffuse;
     Vector3D specular;
     float shininess;
+
+    Texture map_diffuse;
+    Texture map_specular;
+    Texture map_emission;
+    Texture map_ambient_occlusion;
 
     unsigned int indexOffset;
     unsigned int indexCount;

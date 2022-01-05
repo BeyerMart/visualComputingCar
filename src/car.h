@@ -6,17 +6,20 @@ struct Car
 {
     enum ePart
     {
-        LIGHT_BACK = 0,
-        AXLE_BACK,
-        AXLE_FRONT,
-        WHEEL_RESERVE,
+        LIGHTS = 0,
+        DETAILS,
+        WHEEL_SPARE,
         WHEEL_BACK_RIGHT,
         WHEEL_FRONT_RIGHT,
         WHEEL_BACK_LEFT,
         WHEEL_FRONT_LEFT,
-        FENDERS,
-        GRILLE,
         BODY,
+        AXIS_BOTTOM,
+        ROOF,
+        GRILLE,
+        SHOCK_ABSORBER,
+        WINDOWS,
+        INSIDE,
         PART_COUNT
     };
 

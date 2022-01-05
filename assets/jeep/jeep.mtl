@@ -1,0 +1,142 @@
+# Blender MTL File: 'untitled.blend'
+# Material Count: 10
+
+newmtl Body
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.945875 0.598037 0.001133
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd body_map_diffuse.jpeg
+map_Ks body_map_specular.jpeg
+map_Ke black.jpeg
+map_Ka body_map_ao.jpeg
+
+newmtl Grille
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.200000 0.200000 0.200000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd black.jpeg
+map_Ka white.jpeg
+map_Ke black.jpeg
+map_Ks white.jpeg
+
+newmtl Detail
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd black.jpeg
+map_Ka white.jpeg
+map_Ke black.jpeg
+map_Ks white.jpeg
+
+newmtl Light
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd light_map_diffuse.jpeg
+map_Ke light_map_emission.jpeg
+map_Ks white.jpeg
+map_Ka light_map_ao.jpeg
+
+newmtl Shock
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.200000 0.200000 0.200000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd shock_map_diffuse.jpeg
+map_Ke black.jpeg
+map_Ks shock_map_specular.jpeg
+map_Ka shock_map_ao.jpeg
+
+newmtl UNDER
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd black.jpeg
+map_Ks white.jpeg
+map_Ke black.jpeg
+map_Ka under_map_ao.jpeg
+
+newmtl Wheel
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.400000 0.400000 0.400000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd wheel_map_diffuse.jpeg
+map_Ks wheel_map_specular.jpeg
+map_Ke black.jpeg
+map_Ka wheel_map_ao.jpeg
+
+newmtl Inside
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd black.jpeg
+map_Ks white.jpeg
+map_Ke black.jpeg
+map_Ka white.jpeg
+
+newmtl Roof
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd roof_map_diffuse.jpeg
+map_Ks black.jpeg
+map_Ke black.jpeg
+map_Ka white.jpeg
+
+newmtl Windows
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd windows_map_diffuse.jpeg
+map_Ks windows_map_specular.jpeg
+map_Ke black.jpeg
+map_Ka white.jpeg
