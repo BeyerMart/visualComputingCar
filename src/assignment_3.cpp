@@ -6,6 +6,8 @@
 #include "mygl/camera.h"
 
 #include "car.h"
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "../external/stb_image/stb_image.h"
 
 struct
 {
@@ -136,11 +138,13 @@ void sceneInit()
 
     sScene.car = carLoad("assets/jeep/jeep.obj");
     sScene.modelGround = modelLoad("assets/ground/ground.obj").front();
+
     sScene.shader = shaderLoad("shader/default.vert", "shader/color.frag");
     sScene.camera = cameraCreate(1280, 720, to_radians(45.0), 0.01, 100.0, { 12.0, 4.0, 12.0 });
 
     globalDirectionalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
     globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
+
 
 }
 
@@ -165,7 +169,6 @@ void sceneDraw()
 
     shaderUniform(sScene.shader, "globalDirectionalLightColorRGB", globalDirectionalLightColorRGB);
     shaderUniform(sScene.shader, "globalDirectionalLightDirection", globalDirectionalLightDirection);
-
 
 
     // LIGHTS ON
@@ -280,6 +283,30 @@ void sceneDraw()
 
         shaderUniform(sScene.shader, "uModel", sScene.car.transformation * transform);
 
+        /*------textures------*/
+
+        /* upload data to buffer */
+        //glBindBuffer(GL_ARRAY_BUFFER, model.mesh.vbo);
+        //glBufferData(GL_ARRAY_BUFFER, model.mesh.size_vbo * sizeof(Vertex), &model.mesh, GL_STATIC_DRAW);
+        /* enable attribute locations (see vertex shader) */
+        //glEnableVertexAttribArray(eDataIdx::Position);
+        //glEnableVertexAttribArray(eDataIdx::Normal); //color?
+        //glEnableVertexAttribArray(eDataIdx::UV);
+        /* specify location of vertex attributes (see vertex shader) */
+        //glVertexAttribPointer(eDataIdx::Position, 3, GL_FLOAT, GL_FALSE, sizeof.(Vertex), void*) offsetof Vertex));
+        //glVertexAttribPointer(eDataIdx::Normal, 3, GL_FLOAT, GL_FALSE, sizeof.(Vertex), (void*) offsetof(Vertex, normal));
+        //glVertexAttribPointer(eDataIdx::UV, 2, GL_FLOAT, GL_FALSE, sizeof.(Vertex), (void*) offsetof(Vertex, uv));
+
+        /* set texture options for current bound texture object (wrapping, filtering) */
+        GLfloat borderColor[] = { 1.0f , 1.0f , 1.0f , 1.0f };
+        /* set border color */
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        /* set horizontal texture wrapping */
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        /* set vertical texture wrapping */
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
         for (Material& material : model.material)
         {
             /* set material properties */
@@ -288,9 +315,36 @@ void sceneDraw()
             shaderUniform(sScene.shader, "uMaterial.specular", material.specular);
             shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
 
+            /*create texture*/
+            
+            int width, height, nrChannels;
+            Texture* data  = &material.map_ambient_occlusion;
+            printf("Teture-pointer\n");
+
+            unsigned int texture;
+            glGenTextures(1, &texture);
+            printf("\nafterGenerateTextures\n");
+
+            /* activate texture unit */
+            glActiveTexture(GL_TEXTURE0);
+
+            glBindTexture(GL_TEXTURE_2D, texture);
+            printf("\nafterBindTextures\n");
+
+            /* set shader uniform to point to correct texture unit */
+            glUniform1i(glGetUniformLocation(sScene.shader.id, "ourTexture"), 0);
+            printf("\nafterglUniform1i ourTexture\n");
+
+            printf("\nData width: %f \n Data height: %f\n", data->width, data->height);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data->width, data->height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            printf("\nafterTexImage2D\n");
+            glGenerateMipmap(GL_TEXTURE_2D);
 
 
+
+            printf("beforedraw\n");
             glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
+           
         }
     }
 

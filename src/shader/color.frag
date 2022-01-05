@@ -8,20 +8,6 @@ struct Material
     float shininess;
 };
 
-// PointLight was transformed to SpotLight
-// struct PointLight {
-//     vec3 position;
-    
-//     float constant;
-//     float linear;
-//     float quadratic;
-
-//     vec3 ambient;
-//     vec3 diffuse;
-//     vec3 specular;
-// };  
-// #define NR_POINT_LIGHTS 0
-//uniform PointLight pointLights[NR_POINT_LIGHTS];
 
 struct SpotLight {
   vec3 position;
@@ -61,32 +47,7 @@ uniform vec3 viewPosition;
 
 uniform Material uMaterial;
 
-
-//PointLight -> transformed to SpotLight
-// vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-// {
-//     vec3 lightDir = normalize(light.position - fragPos);
-//     // diffuse shading
-//     float diff = max(dot(normal, lightDir), 0.0);
-//     // specular shading
-//     vec3 reflectDir = reflect(-lightDir, normal);
-//     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uMaterial.shininess);
-//     // attenuation
-//     float distance = length(light.position - fragPos);
-//     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-    
-//     // combine results
-//     vec3 ambient  = light.ambient * k_a * uMaterial.ambient * globalAmbientLightColorRGB;
-//     vec3 diffuse  = light.diffuse * diff * diffuseCoefficient * uMaterial.diffuse * globalDirectionalLightColorRGB * dot(tNormal, globalDirectionalLightColorRGB);
-//     vec3 specular = light.specular * specularCoefficient * uMaterial.specular * spec * globalDirectionalLightColorRGB * pow(max (dot(viewDir, reflectDir), 0.0), uMaterial.shininess * 2);
-
-    
-//     ambient  *= attenuation;
-//     diffuse  *= attenuation;
-//     specular *= attenuation;
-
-//     return (ambient + diffuse + specular);
-// }
+uniform sampler2D ourTexture;
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
@@ -142,5 +103,5 @@ void main(void)
         result += CalcSpotLight(spotLights[i], tNormal, tFragPos, viewDir);
     }
 
-    fragColor = vec4(result, 1.0);
+    fragColor = texture(ourTexture, tUV) * vec4(result, 1.0);
 }
