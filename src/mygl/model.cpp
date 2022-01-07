@@ -136,6 +136,7 @@ std::map<std::string, Material> materialLoad(const std::string &filepath)
             std::string texture_path;
             ss  >> texture_path;
             current->map_diffuse = textureLoad(filepath.substr(0, filepath.find_last_of("\\/")) + "/" + texture_path);
+            std::cout << texture_path << std::endl;
         }
         /* ambient occlusion map */
         else if(code == "map_Ka" && current)

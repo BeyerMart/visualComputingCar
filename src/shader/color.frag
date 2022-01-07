@@ -47,7 +47,9 @@ uniform vec3 viewPosition;
 
 uniform Material uMaterial;
 
-uniform sampler2D ourTexture;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
+
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
@@ -103,5 +105,8 @@ void main(void)
         result += CalcSpotLight(spotLights[i], tNormal, tFragPos, viewDir);
     }
 
-    fragColor = texture(ourTexture, tUV) * vec4(result, 1.0);
+    //fragColor = mix(texture(texture1, tUV), texture(texture2, tUV), 0.5)   * vec4(result, 1.0);
+    fragColor = texture(texture1, tUV) * vec4(result, 1.0);
+    //fragColor = vec4(result, 1.0);
+
 }
