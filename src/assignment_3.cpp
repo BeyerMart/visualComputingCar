@@ -321,6 +321,8 @@ void sceneDraw()
     
     shaderUniform(sScene.shader, "viewPosition", sScene.camera.position);
 
+
+
     /* render car */
     for (unsigned int i = 0; i < sScene.car.parts.size(); i++)
     {
@@ -332,31 +334,28 @@ void sceneDraw()
 
         /*------textures------*/
 
-
         for (Material& material : model.material)
         {
             /* set material properties */
-            shaderUniform(sScene.shader, "uMaterial.diffuse", material.diffuse);
-            shaderUniform(sScene.shader, "uMaterial.ambient", material.ambient);
-            shaderUniform(sScene.shader, "uMaterial.specular", material.specular);
-            shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
+            //shaderUniform(sScene.shader, "uMaterial.diffuse", material.diffuse);
+            //shaderUniform(sScene.shader, "uMaterial.ambient", material.ambient);
+            //shaderUniform(sScene.shader, "uMaterial.specular", material.specular);
+            //shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
 
             // bind Texture
-            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, material.map_diffuse.id);
             glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
 
-            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, material.map_emission.id);
             glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
 
-            //glActiveTexture(GL_TEXTURE0);
-            //glBindTexture(GL_TEXTURE_2D, material.map_specular.id);
-            //glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
+            glBindTexture(GL_TEXTURE_2D, material.map_specular.id);
+            glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
 
-            //glActiveTexture(GL_TEXTURE0);
-            //glBindTexture(GL_TEXTURE_2D, material.map_ambient_occlusion.id);
-            //glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
+            glBindTexture(GL_TEXTURE_2D, material.map_ambient_occlusion.id);
+            glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
+
+
 
             //glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
         }
