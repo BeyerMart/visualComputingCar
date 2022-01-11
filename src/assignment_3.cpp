@@ -145,54 +145,6 @@ void sceneInit()
     globalDirectionalLightColorRGB = Vector3D(0.9, 0.9, 0.9);
     globalDirectionalLightDirection = Vector3D(1, 1, 0.5);
 
-    /*create textures*/
-    //for (unsigned int i = 0; i < sScene.car.parts.size(); i++)
-    /*
-    for (unsigned int i = 0; i < 1; i++)
-
-    {
-        Model& model = sScene.car.parts[Car::WHEEL_FRONT_LEFT];
-        printf("\nmodelname: %s", model.name.c_str());
-        for (Material& material : sScene.car.parts[Car::WHEEL_FRONT_LEFT].material) {
-            Material textureWheelAO = material;
-            printf("\nTexture-pointer");
-
-            printf("\nWheelFrontLeftMaterials: %ld", sScene.car.parts[Car::WHEEL_FRONT_LEFT].material.size());
-            //printf("\nWheelFrontLeftMat0 id: %d", sScene.car.parts[Car::WHEEL_FRONT_LEFT].material[0].map_ambient_occlusion.height);
-            //printf("\nWheelFrontLeftMat0 id: %d", textureWheelAO.height);
-
-
-            glGenTextures(1, &texture1);
-            printf("\nafterGenerateTextures");
-
-            /* activate texture unit * /
-            glActiveTexture(GL_TEXTURE0 + id);
-
-            glBindTexture(GL_TEXTURE_2D, texture1);
-            printf("\nafterBindTextures");
-
-            // set the texture wrapping parameters
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	//set texture wrapping to GL_REPEAT (default wrapping method)
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            // set texture filtering parameters
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            printf("\nData width: %d \nData height: %d", textureWheelAO.map_ambient_occlusion.width, textureWheelAO.map_ambient_occlusion.height);
-            if (&textureWheelAO) {
-                // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWheelAO.map_ambient_occlusion.width, textureWheelAO.map_ambient_occlusion.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureWheelAO.);
-                glGenerateMipmap(GL_TEXTURE_2D);
-            }
-            else {
-                std::cout << "Failed to load texture" << std::endl;
-            }
-            printf("\nafterTexImage2D");
-            /* set shader uniform to point to correct texture unit * /
-            glUniform1i(glGetUniformLocation(sScene.shader.id, "texture1"), 0);
-        }
-        
-    }*/
 }
 
 void sceneUpdate(float dt)
