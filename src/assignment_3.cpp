@@ -354,10 +354,6 @@ void sceneDraw()
 
             glBindTexture(GL_TEXTURE_2D, material.map_ambient_occlusion.id);
             glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
-
-
-
-            //glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
         }
     }
 
@@ -374,6 +370,7 @@ void sceneDraw()
         shaderUniform(sScene.shader, "uMaterial.shininess", material.shininess);
         //printf("%s\n", toString(material.ambient).c_str());
 
+        glBindTexture(GL_TEXTURE_2D, material.map_diffuse.id);
         glDrawElements(GL_TRIANGLES, material.indexCount, GL_UNSIGNED_INT, (const void*)(material.indexOffset * sizeof(unsigned int)));
     }
 
